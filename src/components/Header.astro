@@ -1,0 +1,151 @@
+---
+import { Icon } from 'astro-icon/components';
+
+const base = import.meta.env.BASE_URL ?? '/';
+---
+
+<header class="sticky top-0 bg-white/95 dark:bg-gray-900/95 shadow-sm z-[1000] transition-colors">
+  <nav class="container py-3 md:py-4">
+    <div class="flex justify-between items-center">
+      <a
+        href={base}
+        data-astro-reload
+        class="flex items-center gap-3 text-2xl font-extrabold text-primary tracking-tight"
+      >
+        <span
+          class="inline-block w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white shadow"
+          >CT</span
+        >
+        <span class="sr-only">Home</span>
+        <span class="ml-1">Chris Tulsi</span>
+      </a>
+      <button
+        id="mobile-menu-toggle"
+        class="mobile-menu-toggle md:hidden flex flex-col gap-1 p-2 z-[1001]"
+        aria-label="Toggle menu"
+      >
+        <span class="w-6 h-0.5 bg-gray-900 dark:bg-gray-50 transition-all duration-300 rounded"
+        ></span>
+        <span class="w-6 h-0.5 bg-gray-900 dark:bg-gray-50 transition-all duration-300 rounded"
+        ></span>
+        <span class="w-6 h-0.5 bg-gray-900 dark:bg-gray-50 transition-all duration-300 rounded"
+        ></span>
+      </button>
+      <div
+        class="nav-right fixed md:static top-0 -right-full md:right-auto h-screen md:h-auto w-[78%] max-w-[360px] md:w-auto md:max-w-none bg-white/95 dark:bg-gray-900/95 md:bg-transparent flex flex-col md:flex-row items-center gap-6 pt-24 md:pt-0 px-8 md:px-0 transition-[right] duration-300 shadow-2xl md:shadow-none rounded-l-2xl md:rounded-none"
+        id="nav-menu"
+      >
+        <ul class="flex flex-col md:flex-row gap-6 md:gap-8 w-full md:w-auto">
+          <li>
+            <a
+              href={`${base}#about`}
+              class="text-gray-900 dark:text-gray-50 hover:text-primary font-medium transition-colors block text-lg md:text-base"
+              >About</a
+            >
+          </li>
+          <li>
+            <a
+              href={`${base}#projects`}
+              class="text-gray-900 dark:text-gray-50 hover:text-primary font-medium transition-colors block text-lg md:text-base"
+              >Projects</a
+            >
+          </li>
+          <li>
+            <a
+              href={`${base}#experience`}
+              class="text-gray-900 dark:text-gray-50 hover:text-primary font-medium transition-colors block text-lg md:text-base"
+              >Experience</a
+            >
+          </li>
+          <li>
+            <a
+              href={`${base}#contact`}
+              class="text-gray-900 dark:text-gray-50 hover:text-primary font-medium transition-colors block text-lg md:text-base"
+              >Contact</a
+            >
+          </li>
+        </ul>
+        <div class="flex items-center gap-3">
+          <button
+            id="theme-toggle"
+            class="mt-auto md:mt-0 w-10 h-10 border-2 border-gray-200 dark:border-gray-700 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-primary transition-all shadow-sm"
+            aria-label="Toggle dark mode"
+          >
+            <Icon name="heroicons:sun-20-solid" class="sun-icon hidden dark:block w-5 h-5" />
+            <Icon name="heroicons:moon-20-solid" class="moon-icon block dark:hidden w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<script>
+  const themeToggle = document.getElementById('theme-toggle');
+  const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+  const navMenu = document.getElementById('nav-menu');
+
+  themeToggle?.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  });
+
+  mobileMenuToggle?.addEventListener('click', () => {
+    const spans = mobileMenuToggle.querySelectorAll('span');
+    spans[0]?.classList.toggle('!rotate-45');
+    spans[0]?.classList.toggle('!translate-y-1.5');
+    spans[1]?.classList.toggle('!opacity-0');
+    spans[2]?.classList.toggle('!-rotate-45');
+    spans[2]?.classList.toggle('!-translate-y-1.5');
+
+    navMenu?.classList.toggle('!right-0');
+    document.body.classList.toggle('overflow-hidden');
+  });
+
+  // Close menu when clicking an in-page anchor link
+  const navLinks = document.querySelectorAll('a[href*="#"]');
+  navLinks.forEach((link) => {
+    link.addEventListener('click', (ev) => {
+      const spans = mobileMenuToggle?.querySelectorAll('span');
+      spans?.forEach((span, idx) => {
+        if (idx === 0) {
+          span.classList.remove('!rotate-45', '!translate-y-1.5');
+        } else if (idx === 1) {
+          span.classList.remove('!opacity-0');
+        } else if (idx === 2) {
+          span.classList.remove('!-rotate-45', '!-translate-y-1.5');
+        }
+      });
+      navMenu?.classList.remove('!right-0');
+      document.body.classList.remove('overflow-hidden');
+
+      // If this anchor is an absolute base-prefixed link (e.g. '/portfolio#projects')
+      // and we're already on the homepage path, prevent a full reload and smoothly scroll.
+      try {
+        const href = link.getAttribute('href') || '';
+        const base = import.meta.env.BASE_URL ?? '/';
+        const normalizedBase = base.replace(/\/$/, '');
+        if (href.startsWith(normalizedBase + '#') || href.startsWith(base + '#')) {
+          const currentPath = location.pathname.replace(/\/$/, '');
+          // Accept both '/portfolio' and '/portfolio/' as homepage paths
+          if (currentPath === normalizedBase || currentPath === '' || currentPath === '/') {
+            ev.preventDefault();
+            const hash = href.split('#')[1];
+            if (hash) {
+              const target = document.getElementById(hash);
+              if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+                history.replaceState(null, '', '#' + hash);
+              }
+            }
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    });
+  });
+</script>

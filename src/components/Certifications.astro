@@ -1,0 +1,74 @@
+---
+import certificationsData from '../data/certifications.json';
+import type { Certification } from '../types/data';
+
+const certifications = certificationsData as Certification[];
+---
+
+<section id="certifications" class="py-20 bg-transparent relative">
+  <!-- Decorative background elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div
+      class="absolute bottom-20 -left-32 w-96 h-96 bg-purple-300/20 dark:bg-purple-500/10 rounded-full blur-3xl"
+    >
+    </div>
+  </div>
+
+  <div class="container relative z-10">
+    <h2 class="fade-in text-4xl text-center mb-4">Certifications & Education</h2>
+    <p class="fade-in text-center text-gray-600 dark:text-gray-400 text-lg mb-12 max-w-2xl mx-auto">
+      Professional certifications and academic achievements that demonstrate continuous learning and
+      expertise
+    </p>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+      {
+        certifications.map((cert, index) => (
+          <div
+            class={`relative bg-white/60 dark:bg-gray-800/40 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-3xl p-6 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10 dark:hover:shadow-primary/20 group overflow-hidden animate-fade-in-up-${Math.min(index + 1, 12)}`}
+          >
+            {/* Gradient accent left bar */}
+            <div class="absolute top-0 left-0 bottom-0 w-1.5 bg-gradient-to-b from-primary via-purple-500 to-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+            <div class="flex items-start gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-primary/20 to-secondary/20 dark:from-primary/30 dark:to-secondary/30 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg shadow-primary/20">
+                {cert.icon}
+              </div>
+              <div class="flex-grow">
+                <h3 class="text-lg font-semibold mb-1 leading-tight">{cert.name}</h3>
+                <p class="text-sm text-primary font-medium">{cert.issuer}</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <span class="text-sm text-gray-600 dark:text-gray-400">{cert.date}</span>
+              {cert.verifyUrl && cert.verifyUrl !== '#' && (
+                <a
+                  href={cert.verifyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-sm text-primary hover:text-primary-dark font-medium flex items-center gap-1"
+                >
+                  Verify
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+              )}
+            </div>
+            {cert.credentialId && cert.credentialId !== 'Your-Credential-ID' && (
+              <p class="text-xs text-gray-500 dark:text-gray-500 mt-2">ID: {cert.credentialId}</p>
+            )}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

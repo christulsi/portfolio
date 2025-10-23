@@ -1,0 +1,31 @@
+---
+import projectsData from '../data/projects.json';
+import type { Project } from '../types/data';
+
+import ProjectCard from './ProjectCard.astro';
+
+const projects = projectsData as Project[];
+---
+
+<section id="projects" class="py-20 bg-transparent relative">
+  <!-- Decorative background elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div
+      class="absolute top-1/3 -right-32 w-96 h-96 bg-indigo-300/20 dark:bg-indigo-500/10 rounded-full blur-3xl"
+    >
+    </div>
+  </div>
+
+  <div class="container relative z-10">
+    <h2 class="fade-in text-4xl text-center mb-12">Featured Projects</h2>
+    <div class="grid md:grid-cols-2 gap-8">
+      {
+        projects.map((project, index) => (
+          <div class={`animate-fade-in-up-${Math.min(index + 1, 12)}`}>
+            <ProjectCard {...project} />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

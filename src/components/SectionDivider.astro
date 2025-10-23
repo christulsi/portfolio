@@ -1,0 +1,103 @@
+---
+interface Props {
+  variant?: 'wave' | 'wave-alt' | 'curve';
+  color?: 'gradient' | 'primary' | 'secondary' | 'white' | 'gray';
+  position?: 'top' | 'bottom' | 'both';
+  animate?: boolean;
+}
+
+const { variant = 'wave', color = 'gradient', position = 'bottom', animate = true } = Astro.props;
+
+const getColor = () => {
+  switch (color) {
+    case 'gradient':
+      return 'url(#divider-gradient)';
+    case 'primary':
+      return '#3b82f6';
+    case 'secondary':
+      return '#8b5cf6';
+    case 'white':
+      return '#ffffff';
+    case 'gray':
+      return '#f3f4f6';
+    default:
+      return 'url(#divider-gradient)';
+  }
+};
+
+const wavePath = {
+  wave: 'M0,32L48,37.3C96,43,192,53,288,58.7C384,64,480,64,576,58.7C672,53,768,43,864,48C960,53,1056,75,1152,80C1248,85,1344,75,1392,69.3L1440,64L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z',
+  'wave-alt':
+    'M0,64L48,58.7C96,53,192,43,288,48C384,53,480,75,576,80C672,85,768,75,864,69.3C960,64,1056,64,1152,58.7C1248,53,1344,43,1392,37.3L1440,32L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z',
+  curve: 'M0,32L1440,96L1440,0L0,0Z',
+};
+---
+
+{
+  position === 'top' || position === 'both' ? (
+    <div class="section-divider section-divider-top w-full overflow-hidden leading-none">
+      <svg
+        class={`w-full h-12 md:h-16 ${animate ? 'animate-wave' : ''}`}
+        viewBox="0 0 1440 96"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
+      >
+        <defs>
+          <linearGradient id="divider-gradient-top" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.5" />
+            <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:0.6" />
+            <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.5" />
+          </linearGradient>
+        </defs>
+        <path
+          d={wavePath[variant]}
+          fill={color === 'gradient' ? 'url(#divider-gradient-top)' : getColor()}
+        />
+      </svg>
+    </div>
+  ) : null
+}
+
+{
+  position === 'bottom' || position === 'both' ? (
+    <div class="section-divider section-divider-bottom w-full overflow-hidden leading-none rotate-180">
+      <svg
+        class={`w-full h-12 md:h-16 ${animate ? 'animate-wave' : ''}`}
+        viewBox="0 0 1440 96"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
+      >
+        <defs>
+          <linearGradient id="divider-gradient-bottom" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.5" />
+            <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:0.6" />
+            <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.5" />
+          </linearGradient>
+        </defs>
+        <path
+          d={wavePath[variant]}
+          fill={color === 'gradient' ? 'url(#divider-gradient-bottom)' : getColor()}
+        />
+      </svg>
+    </div>
+  ) : null
+}
+
+<style>
+  .section-divider {
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-divider svg {
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .section-divider svg {
+      animation: none !important;
+    }
+  }
+</style>

@@ -1,0 +1,436 @@
+---
+import { SEO } from 'astro-seo';
+
+import Toast from '../components/Toast.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  type?: string;
+}
+
+const {
+  title,
+  description = 'Senior ICT Engineer specializing in ERP, data engineering, and AI/ML solutions. Building scalable software for government and enterprise.',
+  image = '/og-image.png',
+  type = 'website',
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const imageURL = new URL(`/portfolio${image.replace(/^\//, '')}`, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- SEO Meta Tags -->
+    <SEO
+      title={title}
+      description={description}
+      canonical={canonicalURL.toString()}
+      openGraph={{
+        basic: {
+          title,
+          type,
+          image: imageURL.toString(),
+          url: Astro.url.toString(),
+        },
+        optional: {
+          description,
+          siteName: 'Chris Tulsi - Portfolio',
+        },
+        image: {
+          alt: 'Chris Tulsi - Senior ICT Engineer Portfolio',
+        },
+      }}
+      twitter={{
+        card: 'summary_large_image',
+        site: '@christulsi',
+        creator: '@christulsi',
+        title,
+        description,
+        image: imageURL.toString(),
+        imageAlt: 'Chris Tulsi - Senior ICT Engineer Portfolio',
+      }}
+      extend={{
+        meta: [
+          { name: 'theme-color', content: '#3b82f6' },
+          { name: 'msapplication-TileColor', content: '#3b82f6' },
+          { name: 'generator', content: Astro.generator },
+          { name: 'author', content: 'Chris Tulsi' },
+          {
+            name: 'keywords',
+            content:
+              'Chris Tulsi, Senior ICT Engineer, Software Engineer, ERP Systems, Data Engineering, AI/ML, AWS, Cloud Computing, DevOps, Python, JavaScript, Frappe, ERPNext, Portfolio',
+          },
+          { name: 'robots', content: 'index, follow' },
+          {
+            name: 'googlebot',
+            content: 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1',
+          },
+          { property: 'og:locale', content: 'en_US' },
+          { property: 'article:author', content: 'Chris Tulsi' },
+        ],
+      }}
+    />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href={new URL('/portfolio/favicon.svg', Astro.site)} />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href={new URL('/portfolio/favicon-base.svg', Astro.site)}
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href={new URL('/portfolio/favicon-base.svg', Astro.site)}
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href={new URL('/portfolio/apple-touch-icon.svg', Astro.site)}
+    />
+    <link rel="manifest" href={new URL('/portfolio/site.webmanifest', Astro.site)} />
+
+    <!-- Structured Data (JSON-LD) for SEO -->
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        name: 'Chris Tulsi',
+        jobTitle: 'Software Engineer',
+        description:
+          'Software Engineer specializing in ERP systems, data engineering, and AI/ML solutions. AWS Certified Cloud Practitioner with expertise in building scalable software for government and enterprise clients.',
+        url: 'https://christulsi.github.io/portfolio',
+        image: 'https://christulsi.github.io/portfolio/og-image.png',
+        sameAs: ['https://github.com/christulsi', 'https://linkedin.com/in/christulsi'],
+        alumniOf: [
+          {
+            '@type': 'EducationalOrganization',
+            name: 'Nankai University',
+            description: "Master's Degree in Computer Software Engineering",
+          },
+          {
+            '@type': 'EducationalOrganization',
+            name: 'University of Guyana',
+            description: "Bachelor's Degree in Computer Science",
+          },
+        ],
+        hasCredential: {
+          '@type': 'EducationalOccupationalCredential',
+          name: 'AWS Certified Cloud Practitioner',
+          credentialCategory: 'certification',
+          recognizedBy: {
+            '@type': 'Organization',
+            name: 'Amazon Web Services',
+          },
+        },
+        knowsAbout: [
+          'Software Engineering',
+          'Cloud Computing',
+          'DevOps',
+          'Data Engineering',
+          'Artificial Intelligence',
+          'Machine Learning',
+          'ERP Systems',
+          'Python',
+          'JavaScript',
+          'AWS',
+          'Docker',
+          'CI/CD',
+        ],
+        worksFor: {
+          '@type': 'Organization',
+          name: 'National Data Management Authority',
+        },
+      })}
+    />
+
+    <!-- Inter font with Partytown -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+      type="text/partytown"
+    />
+    <script is:inline>
+      // Dark mode initialization (runs before page render to prevent flash)
+      // Priority: localStorage > system preference > dark fallback
+      const getDefaultTheme = () => {
+        const stored = localStorage.getItem('theme');
+        if (stored) return stored;
+
+        // Check system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+          return 'light';
+        }
+
+        // Fallback to dark if no preference
+        return 'light';
+      };
+
+      const theme = getDefaultTheme();
+      document.documentElement.setAttribute('data-theme', theme);
+    </script>
+  </head>
+  <body>
+    <div id="scroll-progress" aria-hidden="true"></div>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <Toast />
+    <slot />
+    <script>
+      // Intersection Observer for scroll animations
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px',
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target); // Stop observing after visible
+          }
+        });
+      }, observerOptions);
+
+      // Observe all elements with fade-in class
+      document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+
+      // Scroll progress indicator with performance optimization
+      const scrollProgress = document.getElementById('scroll-progress');
+      let ticking = false;
+
+      function updateScrollProgress() {
+        const windowHeight =
+          document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = window.scrollY / windowHeight;
+        if (scrollProgress) {
+          scrollProgress.style.transform = `scaleX(${scrolled})`;
+        }
+        ticking = false;
+      }
+
+      window.addEventListener(
+        'scroll',
+        () => {
+          if (!ticking) {
+            window.requestAnimationFrame(updateScrollProgress);
+            ticking = true;
+          }
+        },
+        { passive: true }
+      );
+    </script>
+    <script>
+      // Ensure hash navigation scrolls correctly after SPA navigation or client routing.
+      function scrollToHash(h: string | null) {
+        if (!h) return;
+        const id = h.replace(/^#/, '');
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        if (location.hash) {
+          // small delay to allow content to render
+          setTimeout(() => scrollToHash(location.hash), 50);
+        }
+      });
+
+      window.addEventListener('hashchange', () => {
+        // delay to allow route/component updates
+        setTimeout(() => scrollToHash(location.hash), 50);
+      });
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+
+  @layer base {
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Performance optimizations */
+    * {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:bg-gradient-to-br dark:from-gray-950 dark:via-slate-900 dark:to-gray-900 text-gray-900 dark:text-gray-50 leading-relaxed font-sans;
+      background-attachment: fixed;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      @apply font-bold leading-tight;
+    }
+
+    a {
+      @apply text-primary hover:text-primary-dark transition-colors duration-300 no-underline;
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      @apply outline-primary outline-offset-2 outline-[3px];
+    }
+
+    *:focus:not(:focus-visible) {
+      @apply outline-none;
+    }
+  }
+
+  @layer components {
+    .fade-in {
+      opacity: 0;
+      transform: translateY(2rem);
+      transition:
+        opacity 400ms ease-out,
+        transform 400ms ease-out;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .container {
+      @apply max-w-6xl mx-auto px-6 lg:px-8;
+    }
+
+    .skip-link {
+      @apply absolute -top-24 left-4 bg-primary text-white px-6 py-3 no-underline font-semibold rounded-md z-[10000] focus:top-4;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      @apply inline-block px-6 py-3 rounded-lg bg-primary font-semibold shadow-md hover:bg-primary-dark transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-xl;
+      color: white !important;
+    }
+
+    .btn-outline {
+      @apply inline-block px-6 py-3 rounded-lg border-2 border-primary text-primary font-semibold bg-transparent hover:bg-primary transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg;
+    }
+
+    .btn-outline:hover {
+      color: white !important;
+    }
+
+    /* Small utilities */
+    #scroll-progress {
+      @apply fixed top-0 left-0 h-1 bg-gradient-to-r from-primary to-secondary z-[10001] shadow-md;
+      height: 3px;
+      width: 100%;
+      transform: scaleX(0);
+      transform-origin: left;
+      will-change: transform;
+    }
+
+    /* Enhanced button with ripple and shimmer effects */
+    .btn-enhanced {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    /* Gradient shimmer effect */
+    .btn-enhanced::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 100%
+      );
+      background-size: 200% 100%;
+      background-position: -200% center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+
+    .btn-enhanced:hover::before {
+      opacity: 1;
+      animation: shimmer 2s ease-in-out infinite;
+    }
+
+    /* Ripple effect container */
+    .btn-enhanced::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .btn-enhanced.ripple::after {
+      animation: ripple 0.6s ease-out;
+    }
+
+    /* Form field validation states */
+    .field-valid {
+      @apply border-green-500 dark:border-green-400;
+    }
+
+    .field-invalid {
+      @apply border-red-500 dark:border-red-400;
+      animation: shake 0.4s ease-in-out;
+    }
+
+    .field-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+  }
+
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .btn-enhanced::before,
+    .btn-enhanced::after {
+      animation: none !important;
+    }
+
+    .field-invalid {
+      animation: none !important;
+    }
+  }
+</style>

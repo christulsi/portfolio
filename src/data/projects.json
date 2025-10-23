@@ -1,0 +1,23 @@
+[
+  {
+    "title": "ERPNext Implementation & Customization",
+    "description": "Deployed and customized ERPNext ERP software for government agencies, streamlining business processes, inventory management, and financial operations with tailored modules and workflows.",
+    "technologies": ["ERPNext", "Python", "Frappe", "MariaDB", "JavaScript"],
+    "liveUrl": "https://erpnext.com"
+  },
+  {
+    "title": "Single Window Application Platform",
+    "description": "Architected and developed a unified application system for the Central Housing and Planning Authority, reducing processing time by 40% and streamlining workflows.",
+    "technologies": ["Python", "Frappe", "MariaDB", "JavaScript"]
+  },
+  {
+    "title": "Data Engineering & AI Solutions R&D",
+    "description": "Research and development of advanced data engineering pipelines and AI/ML solutions for analytics, predictive modeling, and automation. Built scalable data infrastructure and implemented machine learning models for business intelligence.",
+    "technologies": ["Python", "TensorFlow", "Apache Spark", "AWS", "Docker", "Pandas"]
+  },
+  {
+    "title": "CI/CD Pipeline Automation",
+    "description": "Implemented automated CI/CD pipelines with GitLab and runners, reducing deployment time by 50% and increasing release reliability across multiple government projects.",
+    "technologies": ["GitLab CI/CD", "Docker", "Terraform", "Fastlane"]
+  }
+]

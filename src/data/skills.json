@@ -1,0 +1,16 @@
+{
+  "categories": [
+    {
+      "name": "Frontend & Mobile",
+      "skills": ["React", "Angular", "Flutter", "JavaScript (ES6+)", "Dart", "HTML5/CSS3"]
+    },
+    {
+      "name": "Backend & Databases",
+      "skills": ["Python", "Django", "Frappe", "PostgreSQL", "MariaDB", "MySQL"]
+    },
+    {
+      "name": "DevOps & Cloud",
+      "skills": ["AWS", "Docker", "GitLab CI/CD", "Jenkins", "Terraform", "Nginx"]
+    }
+  ]
+}

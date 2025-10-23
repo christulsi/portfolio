@@ -1,0 +1,60 @@
+---
+
+---
+
+<button
+  id="scroll-to-top"
+  class="fixed bottom-8 right-8 w-12 h-12 bg-primary text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 opacity-0 invisible hover:bg-primary-dark hover:scale-110 z-50 cursor-pointer"
+  aria-label="Scroll to top"
+>
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+  >
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+</button>
+
+<script>
+  const scrollToTopBtn = document.getElementById('scroll-to-top');
+  let isVisible = false;
+  let ticking = false;
+
+  function updateButtonVisibility() {
+    const shouldShow = window.scrollY > 300;
+    if (shouldShow && !isVisible) {
+      scrollToTopBtn?.classList.remove('opacity-0', 'invisible');
+      scrollToTopBtn?.classList.add('opacity-100', 'visible');
+      isVisible = true;
+    } else if (!shouldShow && isVisible) {
+      scrollToTopBtn?.classList.add('opacity-0', 'invisible');
+      scrollToTopBtn?.classList.remove('opacity-100', 'visible');
+      isVisible = false;
+    }
+    ticking = false;
+  }
+
+  // Show/hide button based on scroll position - optimized with RAF
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateButtonVisibility);
+        ticking = true;
+      }
+    },
+    { passive: true }
+  );
+
+  // Scroll to top when clicked
+  scrollToTopBtn?.addEventListener('click', () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  });
+</script>

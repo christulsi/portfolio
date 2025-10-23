@@ -1,0 +1,146 @@
+---
+import { Icon } from 'astro-icon/components';
+
+const currentYear = new Date().getFullYear();
+const base = import.meta.env.BASE_URL ?? '/';
+---
+
+<footer class="bg-gradient-to-br from-gray-900 to-slate-900 text-white pt-16 pb-8 mt-16">
+  <div class="container">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-12 mb-12">
+      <div>
+        <h3 class="text-white text-2xl mb-4">Chris Tulsi</h3>
+        <p class="text-white/80 leading-relaxed mb-6">
+          Senior ICT Engineer delivering robust, scalable solutions for government and enterprise
+          clients.
+        </p>
+        <div class="flex gap-4">
+          <a
+            href="https://github.com/christulsi"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            class="text-white w-10 h-10 flex items-center justify-center border-2 border-white/30 rounded-full transition-all hover:bg-white hover:text-gray-900 hover:-translate-y-1"
+          >
+            <Icon name="heroicons:code-bracket-square-20-solid" class="w-6 h-6" />
+          </a>
+          <a
+            href="https://linkedin.com/in/christulsi"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            class="text-white w-10 h-10 flex items-center justify-center border-2 border-white/30 rounded-full transition-all hover:bg-white hover:text-gray-900 hover:-translate-y-1"
+          >
+            <Icon name="heroicons:user-group-20-solid" class="w-6 h-6" />
+          </a>
+          <a
+            href="mailto:christulsi@gmail.com"
+            aria-label="Email"
+            class="text-white w-10 h-10 flex items-center justify-center border-2 border-white/30 rounded-full transition-all hover:bg-white hover:text-gray-900 hover:-translate-y-1"
+          >
+            <Icon name="heroicons:envelope-20-solid" class="w-6 h-6" />
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-white text-lg mb-6">Quick Links</h4>
+        <ul class="list-none p-0 m-0 space-y-3">
+          <li>
+            <a
+              href={`${base}#about`}
+              class="text-white/80 hover:text-white hover:underline transition-colors">About</a
+            >
+          </li>
+          <li>
+            <a
+              href={`${base}#projects`}
+              class="text-white/80 hover:text-white hover:underline transition-colors">Projects</a
+            >
+          </li>
+          <li>
+            <a
+              href={`${base}#experience`}
+              class="text-white/80 hover:text-white hover:underline transition-colors">Experience</a
+            >
+          </li>
+          <li>
+            <a
+              href={`${base}#contact`}
+              class="text-white/80 hover:text-white hover:underline transition-colors">Contact</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-white text-lg mb-6">Contact</h4>
+        <ul class="list-none p-0 m-0 space-y-3">
+          <li>
+            <a
+              href={`${base}#contact`}
+              class="text-white/80 hover:text-white hover:underline transition-colors"
+              >Get in Touch</a
+            >
+          </li>
+          <li>
+            <a
+              href="mailto:christulsi@gmail.com"
+              class="text-white/80 hover:text-white hover:underline transition-colors">Email Me</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://github.com/christulsi"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-white/80 hover:text-white hover:underline transition-colors">GitHub</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-white text-lg mb-6">Built With</h4>
+        <ul class="list-none p-0 m-0 space-y-3">
+          <li>
+            <a
+              href="https://astro.build"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-white/80 hover:text-white hover:underline transition-colors">Astro</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.typescriptlang.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-white/80 hover:text-white hover:underline transition-colors">TypeScript</a
+            >
+          </li>
+          <li><span class="text-white/80">Tailwind CSS</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div
+      class="border-t border-white/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-2 text-center md:text-left text-white/80"
+    >
+      <p>&copy; {currentYear} Chris Tulsi. All rights reserved.</p>
+      <p>
+        Built with ❤️ using <a
+          href="https://astro.build"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-white font-semibold hover:underline">Astro</a
+        > & <a
+          href="https://tailwindcss.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-white font-semibold hover:underline">Tailwind CSS</a
+        >
+      </p>
+    </div>
+  </div>
+</footer>

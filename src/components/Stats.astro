@@ -1,0 +1,97 @@
+---
+const stats = [
+  { number: '10+', label: 'Applications Built', icon: '📱' },
+  { number: '6+', label: 'Years Experience', icon: '⏱️' },
+  { number: '5+', label: 'Major Projects', icon: '🚀' },
+  { number: '99.9%', label: 'System Uptime', icon: '🎯' },
+];
+---
+
+<section class="py-16 bg-gradient-to-r from-primary to-secondary">
+  <div class="container">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center">
+      {
+        stats.map((stat) => (
+          <div class="text-white fade-in">
+            <div class="text-5xl mb-4">{stat.icon}</div>
+            <div class="stat-number text-5xl font-bold mb-2 leading-none" data-target={stat.number}>
+              {stat.number}
+            </div>
+            <div class="text-base opacity-90 font-medium">{stat.label}</div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  const animateValue = (
+    element: HTMLElement,
+    start: number,
+    end: number,
+    duration: number,
+    suffix: string = '',
+    decimals: number = 0
+  ) => {
+    const range = end - start;
+    const steps = Math.max(1, Math.round(duration / 16));
+    const increment = range / steps;
+    let current = start;
+
+    const format = (v: number) => {
+      return decimals > 0 ? v.toFixed(decimals) : Math.round(v).toString();
+    };
+
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      current = start + increment * step;
+      if (step >= steps) {
+        element.textContent = format(end) + suffix;
+        clearInterval(timer);
+      } else {
+        element.textContent = format(current) + suffix;
+      }
+    }, 16);
+  };
+
+  const observeStats = () => {
+    const statNumbers = document.querySelectorAll('.stat-number');
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !entry.target.classList.contains('animated')) {
+            entry.target.classList.add('animated');
+            const target = entry.target.getAttribute('data-target') || '0';
+            const hasPlus = target.includes('+');
+            const hasPercent = target.includes('%');
+            // Extract numeric portion, allowing decimals
+            const numericMatch = target.match(/[0-9]+(?:\.[0-9]+)?/);
+            const numValue = numericMatch ? parseFloat(numericMatch[0]) : 0;
+
+            let suffix = '';
+            let decimals = 0;
+            if (hasPlus) suffix = '+';
+            if (hasPercent) suffix = '%';
+            // If the number includes a decimal, preserve one or more decimals
+            if (numericMatch && numericMatch[0].includes('.')) {
+              const parts = numericMatch[0].split('.');
+              if (parts[1]) {
+                decimals = Math.min(2, parts[1].length);
+              }
+            }
+
+            animateValue(entry.target as HTMLElement, 0, numValue, 2000, suffix, decimals);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    statNumbers.forEach((stat) => observer.observe(stat));
+  };
+
+  observeStats();
+</script>

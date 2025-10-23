@@ -1,0 +1,22 @@
+# robots.txt for Chris Tulsi Portfolio
+# https://christulsi.github.io/portfolio
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://christulsi.github.io/portfolio/sitemap-index.xml
+
+# Common bots
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+# Disallow test/build artifacts
+Disallow: /test-results/
+Disallow: /playwright-report/

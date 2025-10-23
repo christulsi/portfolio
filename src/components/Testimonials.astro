@@ -1,0 +1,51 @@
+---
+import testimonialsData from '../data/testimonials.json';
+import type { Testimonial } from '../types/data';
+
+const testimonials = testimonialsData as Testimonial[];
+---
+
+<section class="py-20 bg-transparent relative">
+  <!-- Decorative background elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div
+      class="absolute top-1/2 -right-40 w-80 h-80 bg-pink-300/20 dark:bg-pink-500/10 rounded-full blur-3xl"
+    >
+    </div>
+  </div>
+
+  <div class="container relative z-10">
+    <h2 class="fade-in text-4xl text-center mb-12">Professional Impact</h2>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {
+        testimonials.map((testimonial, index) => (
+          <div
+            class={`group relative bg-white/60 dark:bg-gray-800/40 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-3xl p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10 dark:hover:shadow-primary/20 overflow-hidden animate-fade-in-up-${Math.min(index + 1, 12)}`}
+          >
+            {/* Gradient accent left bar */}
+            <div class="absolute top-0 left-0 bottom-0 w-1.5 bg-gradient-to-b from-primary via-purple-500 to-secondary rounded-l-3xl" />
+
+            {/* Decorative gradient background */}
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+            <div class="text-7xl text-gradient bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent opacity-30 absolute top-4 right-6 leading-none font-serif">
+              "
+            </div>
+            <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-6 relative z-10">
+              {testimonial.text}
+            </p>
+            <div class="flex items-center gap-4 relative z-10">
+              <div class="w-12 h-12 bg-gradient-to-br from-primary/20 to-secondary/20 dark:from-primary/30 dark:to-secondary/30 rounded-full flex items-center justify-center text-2xl flex-shrink-0 shadow-lg shadow-primary/20">
+                {testimonial.image}
+              </div>
+              <div>
+                <div class="font-semibold">{testimonial.name}</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">{testimonial.role}</div>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
