@@ -3,7 +3,7 @@
  * Modular architecture for the particle animation background
  */
 
-import * as THREE from 'three';
+import { Points } from 'three';
 
 import {
   ANIMATION_SPEED,
@@ -66,7 +66,7 @@ export default function initThreeHero(): void {
   // Generate particle positions (async with worker or sync fallback)
   const worker = generateParticlePositions(geometry);
 
-  const points = new THREE.Points(geometry, material);
+  const points = new Points(geometry, material);
   scene.add(points);
 
   // Create post-processing composer with bloom effect

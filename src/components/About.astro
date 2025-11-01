@@ -1,8 +1,8 @@
 ---
-import skillsData from '../data/skills.json';
-import type { Skills } from '../types/data';
+import { getCollection } from 'astro:content';
 
-const skills = skillsData as Skills;
+const skillEntries = await getCollection('skills');
+const categories = skillEntries.map((entry) => entry.data);
 ---
 
 <section id="about" class="py-20 bg-transparent relative">
@@ -44,7 +44,7 @@ const skills = skillsData as Skills;
         <h3 class="text-2xl mb-8">Skills & Technologies</h3>
         <div class="flex flex-col gap-8">
           {
-            skills.categories.map((category, catIndex) => (
+            categories.map((category, catIndex) => (
               <div>
                 <h4 class="text-primary text-lg mb-4">{category.name}</h4>
                 <div class="flex flex-wrap gap-3">

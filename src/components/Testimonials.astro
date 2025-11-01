@@ -1,8 +1,8 @@
 ---
-import testimonialsData from '../data/testimonials.json';
-import type { Testimonial } from '../types/data';
+import { getCollection } from 'astro:content';
 
-const testimonials = testimonialsData as Testimonial[];
+const testimonialEntries = await getCollection('testimonials');
+const testimonials = testimonialEntries.map((entry) => entry.data);
 ---
 
 <section class="py-20 bg-transparent relative">

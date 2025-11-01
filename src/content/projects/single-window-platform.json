@@ -1,0 +1,5 @@
+{
+  "title": "Single Window Application Platform",
+  "description": "Architected and developed a unified application system for the Central Housing and Planning Authority, reducing processing time by 40% and streamlining workflows.",
+  "technologies": ["Python", "Frappe", "MariaDB", "JavaScript"]
+}

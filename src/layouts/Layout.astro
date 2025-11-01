@@ -1,5 +1,6 @@
 ---
 import { SEO } from 'astro-seo';
+import { ClientRouter } from 'astro:transitions';
 
 import Toast from '../components/Toast.astro';
 
@@ -13,7 +14,7 @@ interface Props {
 const {
   title,
   description = 'Senior ICT Engineer specializing in ERP, data engineering, and AI/ML solutions. Building scalable software for government and enterprise.',
-  image = '/og-image.png',
+  image = '/og-image.svg',
   type = 'website',
 } = Astro.props;
 
@@ -99,6 +100,9 @@ const imageURL = new URL(`/portfolio${image.replace(/^\//, '')}`, Astro.site);
     />
     <link rel="manifest" href={new URL('/portfolio/site.webmanifest', Astro.site)} />
 
+    <!-- View Transitions for smooth page navigation -->
+    <ClientRouter />
+
     <!-- Structured Data (JSON-LD) for SEO -->
     <script
       type="application/ld+json"
@@ -154,14 +158,21 @@ const imageURL = new URL(`/portfolio${image.replace(/^\//, '')}`, Astro.site);
       })}
     />
 
-    <!-- Inter font with Partytown -->
+    <!-- Inter font preloading for optimal performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
+      rel="preload"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-      rel="stylesheet"
-      type="text/partytown"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
     <script is:inline>
       // Dark mode initialization (runs before page render to prevent flash)
       // Priority: localStorage > system preference > dark fallback

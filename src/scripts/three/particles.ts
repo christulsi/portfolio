@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, ShaderMaterial } from 'three';
 
 import { PARTICLE_COUNT, SPHERE_RADIUS, TORUS_MAJOR_RADIUS, TORUS_MINOR_RADIUS } from './constants';
 import { generateCloud, generateFibonacciSphere, generateSeedArray, generateTorus } from './utils';
@@ -7,7 +7,7 @@ import { generateCloud, generateFibonacciSphere, generateSeedArray, generateToru
  * Generate particle positions using a Web Worker for better performance
  * Falls back to synchronous generation if Worker is not available
  */
-export function generateParticlePositions(geometry: THREE.BufferGeometry): Worker | null {
+export function generateParticlePositions(geometry: BufferGeometry): Worker | null {
   let worker: Worker | null = null;
   const useWorker = typeof Worker !== 'undefined';
 
@@ -24,17 +24,17 @@ export function generateParticlePositions(geometry: THREE.BufferGeometry): Worke
 
         if (buf) {
           const positions = new Float32Array(buf);
-          geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+          geometry.setAttribute('position', new BufferAttribute(positions, 3));
         }
 
         if (sphereBuf) {
           const spherePositions = new Float32Array(sphereBuf);
-          geometry.setAttribute('aSpherePosition', new THREE.BufferAttribute(spherePositions, 3));
+          geometry.setAttribute('aSpherePosition', new BufferAttribute(spherePositions, 3));
         }
 
         if (torusBuf) {
           const torusPositions = new Float32Array(torusBuf);
-          geometry.setAttribute('aTorusPosition', new THREE.BufferAttribute(torusPositions, 3));
+          geometry.setAttribute('aTorusPosition', new BufferAttribute(torusPositions, 3));
         }
       });
 
@@ -53,29 +53,29 @@ export function generateParticlePositions(geometry: THREE.BufferGeometry): Worke
 /**
  * Fallback method to generate particle positions synchronously
  */
-function generateParticlePositionsFallback(geometry: THREE.BufferGeometry): void {
+function generateParticlePositionsFallback(geometry: BufferGeometry): void {
   // Generate cloud positions
   const positions = generateCloud(PARTICLE_COUNT);
-  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('position', new BufferAttribute(positions, 3));
 
   // Generate sphere positions (Fibonacci sphere)
   const spherePositions = generateFibonacciSphere(PARTICLE_COUNT, SPHERE_RADIUS);
-  geometry.setAttribute('aSpherePosition', new THREE.BufferAttribute(spherePositions, 3));
+  geometry.setAttribute('aSpherePosition', new BufferAttribute(spherePositions, 3));
 
   // Generate torus positions
   const torusPositions = generateTorus(PARTICLE_COUNT, TORUS_MAJOR_RADIUS, TORUS_MINOR_RADIUS);
-  geometry.setAttribute('aTorusPosition', new THREE.BufferAttribute(torusPositions, 3));
+  geometry.setAttribute('aTorusPosition', new BufferAttribute(torusPositions, 3));
 }
 
 /**
  * Create and configure the particle geometry
  */
-export function createParticleGeometry(): THREE.BufferGeometry {
-  const geometry = new THREE.BufferGeometry();
+export function createParticleGeometry(): BufferGeometry {
+  const geometry = new BufferGeometry();
 
   // Add per-particle seed attribute for randomization
   const seedArray = generateSeedArray(PARTICLE_COUNT);
-  geometry.setAttribute('aSeed', new THREE.BufferAttribute(seedArray, 1));
+  geometry.setAttribute('aSeed', new BufferAttribute(seedArray, 1));
 
   return geometry;
 }
@@ -84,12 +84,12 @@ export function createParticleGeometry(): THREE.BufferGeometry {
  * Create the particle material with shader uniforms
  */
 export function createParticleMaterial(
-  colorA: THREE.Color,
-  colorB: THREE.Color,
+  colorA: Color,
+  colorB: Color,
   vertexShader: string,
   fragmentShader: string
-): THREE.ShaderMaterial {
-  return new THREE.ShaderMaterial({
+): ShaderMaterial {
+  return new ShaderMaterial({
     uniforms: {
       uTime: { value: 0 },
       uPointSize: { value: 1.6 },
@@ -102,6 +102,6 @@ export function createParticleMaterial(
     fragmentShader,
     transparent: true,
     depthTest: true,
-    blending: THREE.AdditiveBlending,
+    blending: AdditiveBlending,
   });
 }

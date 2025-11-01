@@ -1,4 +1,9 @@
-import * as THREE from 'three';
+import {
+  DirectionalLight,
+  PerspectiveCamera,
+  Scene,
+  WebGLRenderer,
+} from 'three';
 
 import {
   CAMERA_FAR,
@@ -11,8 +16,8 @@ import {
 /**
  * Create and configure the Three.js renderer
  */
-export function createRenderer(root: HTMLElement): THREE.WebGLRenderer {
-  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+export function createRenderer(root: HTMLElement): WebGLRenderer {
+  const renderer = new WebGLRenderer({ alpha: true, antialias: true });
 
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO));
   renderer.setSize(root.clientWidth, root.clientHeight);
@@ -29,15 +34,15 @@ export function createRenderer(root: HTMLElement): THREE.WebGLRenderer {
 /**
  * Create and configure the Three.js scene
  */
-export function createScene(): THREE.Scene {
-  return new THREE.Scene();
+export function createScene(): Scene {
+  return new Scene();
 }
 
 /**
  * Create and configure the camera
  */
-export function createCamera(width: number, height: number): THREE.PerspectiveCamera {
-  const camera = new THREE.PerspectiveCamera(CAMERA_FOV, width / height, CAMERA_NEAR, CAMERA_FAR);
+export function createCamera(width: number, height: number): PerspectiveCamera {
+  const camera = new PerspectiveCamera(CAMERA_FOV, width / height, CAMERA_NEAR, CAMERA_FAR);
   camera.position.z = CAMERA_POSITION_Z;
   return camera;
 }
@@ -45,8 +50,8 @@ export function createCamera(width: number, height: number): THREE.PerspectiveCa
 /**
  * Add lighting to the scene
  */
-export function addLighting(scene: THREE.Scene): void {
-  const dirLight = new THREE.DirectionalLight(0xffffff, 0.3);
+export function addLighting(scene: Scene): void {
+  const dirLight = new DirectionalLight(0xffffff, 0.3);
   dirLight.position.set(0, 1, 1);
   scene.add(dirLight);
 }
@@ -56,8 +61,8 @@ export function addLighting(scene: THREE.Scene): void {
  */
 export function handleResize(
   root: HTMLElement,
-  camera: THREE.PerspectiveCamera,
-  renderer: THREE.WebGLRenderer,
+  camera: PerspectiveCamera,
+  renderer: WebGLRenderer,
   composer: any
 ): void {
   const w = root.clientWidth;

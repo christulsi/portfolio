@@ -1,0 +1,5 @@
+{
+  "title": "Data Engineering & AI Solutions R&D",
+  "description": "Research and development of advanced data engineering pipelines and AI/ML solutions for analytics, predictive modeling, and automation. Built scalable data infrastructure and implemented machine learning models for business intelligence.",
+  "technologies": ["Python", "TensorFlow", "Apache Spark", "AWS", "Docker", "Pandas"]
+}

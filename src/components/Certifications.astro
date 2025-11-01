@@ -1,8 +1,8 @@
 ---
-import certificationsData from '../data/certifications.json';
-import type { Certification } from '../types/data';
+import { getCollection } from 'astro:content';
 
-const certifications = certificationsData as Certification[];
+const certificationEntries = await getCollection('certifications');
+const certifications = certificationEntries.map((entry) => entry.data);
 ---
 
 <section id="certifications" class="py-20 bg-transparent relative">

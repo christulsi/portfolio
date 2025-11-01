@@ -1,0 +1,5 @@
+{
+  "title": "CI/CD Pipeline Automation",
+  "description": "Implemented automated CI/CD pipelines with GitLab and runners, reducing deployment time by 50% and increasing release reliability across multiple government projects.",
+  "technologies": ["GitLab CI/CD", "Docker", "Terraform", "Fastlane"]
+}

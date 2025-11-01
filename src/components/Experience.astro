@@ -1,8 +1,8 @@
 ---
-import experiencesData from '../data/experiences.json';
-import type { Experience } from '../types/data';
+import { getCollection } from 'astro:content';
 
-const experiences = experiencesData as Experience[];
+const experienceEntries = await getCollection('experiences');
+const experiences = experienceEntries.map((entry) => entry.data);
 ---
 
 <section id="experience" class="py-20 bg-transparent relative">

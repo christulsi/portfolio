@@ -1,10 +1,10 @@
 ---
-import projectsData from '../data/projects.json';
-import type { Project } from '../types/data';
+import { getCollection } from 'astro:content';
 
 import ProjectCard from './ProjectCard.astro';
 
-const projects = projectsData as Project[];
+const projectEntries = await getCollection('projects');
+const projects = projectEntries.map((entry) => entry.data);
 ---
 
 <section id="projects" class="py-20 bg-transparent relative">

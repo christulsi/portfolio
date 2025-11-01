@@ -1,0 +1,12 @@
+{
+  "title": "ICT Engineer",
+  "company": "National Data Management Authority",
+  "period": "Aug 2019 - Jan 2023",
+  "description": "Developed and maintained 10+ web and mobile applications using JavaScript, Python, and Flutter, serving thousands of users. Optimized and administered PostgreSQL and MariaDB databases, improving query performance by 30%.",
+  "achievements": [
+    "Developed and maintained 10+ web and mobile applications",
+    "Optimized databases, improving query performance by 30%",
+    "Automated deployment pipelines and implemented DevOps best practices",
+    "Provided database administration, backup, and disaster recovery solutions"
+  ]
+}
