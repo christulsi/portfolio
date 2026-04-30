@@ -87,14 +87,13 @@ test.describe('Homepage', () => {
   test('should have a working scroll-to-top button', async ({ page }) => {
     // Scroll down
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(300);
 
-    // Scroll-to-top button should appear
-    const scrollBtn = page.locator('[aria-label="Scroll to top"], button:has-text("Top")');
-    await expect(scrollBtn.first()).toBeVisible({ timeout: 2000 });
+    // Scroll-to-top button should appear after the scroll listener fires
+    const scrollBtn = page.locator('#scroll-to-top');
+    await expect(scrollBtn).toBeVisible({ timeout: 5000 });
 
     // Click it
-    await scrollBtn.first().click();
+    await scrollBtn.click();
     await page.waitForTimeout(1000); // Wait longer for smooth scroll animation
 
     // Should be near top - increase threshold to account for header height

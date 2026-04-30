@@ -4,7 +4,7 @@ test.use(devices['iPhone 12']);
 
 test.describe('Mobile Navigation', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('');
   });
 
   test('should display mobile menu button', async ({ page }) => {
@@ -41,7 +41,7 @@ test.describe('Mobile Navigation', () => {
     await page.waitForTimeout(300);
 
     // Click a navigation link
-    await page.click('nav a[href="#about"]');
+    await page.click('nav a[href*="#about"]');
     await page.waitForTimeout(500);
 
     // Menu should close (or we should navigate away)
@@ -72,17 +72,17 @@ test.describe('Mobile Navigation', () => {
 
   test('should display all sections on mobile', async ({ page }) => {
     // Scroll through sections
-    await expect(page.locator('#about, section:has-text("About")')).toBeVisible();
+    await expect(page.locator('#about')).toBeVisible();
 
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
     await page.waitForTimeout(300);
 
-    await expect(page.locator('#projects, section:has-text("Project")')).toBeVisible();
+    await expect(page.locator('#projects')).toBeVisible();
 
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.waitForTimeout(300);
 
-    await expect(page.locator('#contact, section:has-text("Contact")')).toBeVisible();
+    await expect(page.locator('#contact')).toBeVisible();
   });
 
   test('should not display Three.js on small screens if disabled', async ({ page }) => {

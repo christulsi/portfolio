@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Accessibility', () => {
   test('should not have any automatically detectable accessibility issues', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('');
 
     // Wait for page to fully load
     await page.waitForLoadState('networkidle');
@@ -16,7 +16,7 @@ test.describe('Accessibility', () => {
   });
 
   test('should have proper heading hierarchy', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('');
 
     // Check for h1
     const h1 = page.locator('h1');
@@ -28,7 +28,7 @@ test.describe('Accessibility', () => {
   });
 
   test('should have alt text for images', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('');
 
     const images = page.locator('img');
     const count = await images.count();
@@ -43,8 +43,8 @@ test.describe('Accessibility', () => {
   });
 
   test('should have proper form labels', async ({ page }) => {
-    await page.goto('/');
-    await page.click('nav a[href="#contact"]');
+    await page.goto('');
+    await page.click('nav a[href*="#contact"]');
     await page.waitForTimeout(300);
 
     // Check name input
@@ -61,7 +61,7 @@ test.describe('Accessibility', () => {
   });
 
   test('should have skip link for keyboard navigation', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('');
 
     // Press Tab to focus skip link
     await page.keyboard.press('Tab');
@@ -75,7 +75,7 @@ test.describe('Accessibility', () => {
   });
 
   test('should be keyboard navigable', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('');
 
     // Tab through interactive elements
     await page.keyboard.press('Tab');
@@ -88,16 +88,18 @@ test.describe('Accessibility', () => {
   });
 
   test('should have proper ARIA labels for buttons', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('');
 
     // Theme toggle should have aria-label
-    const themeToggle = page.locator('button[aria-label*="theme" i]').first();
+    const themeToggle = page
+      .locator('button[aria-label*="dark mode" i], button[aria-label*="theme" i]')
+      .first();
     const ariaLabel = await themeToggle.getAttribute('aria-label');
     expect(ariaLabel).toBeTruthy();
   });
 
   test('should have sufficient color contrast', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('');
 
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2aa'])
@@ -113,7 +115,7 @@ test.describe('Accessibility', () => {
   });
 
   test('should not have any critical ARIA violations', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('');
 
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
@@ -128,7 +130,7 @@ test.describe('Accessibility', () => {
   });
 
   test('should work with screen reader (semantic HTML)', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('');
 
     // Check for semantic landmarks
     await expect(page.locator('header')).toBeVisible();

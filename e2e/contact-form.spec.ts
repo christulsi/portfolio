@@ -2,9 +2,9 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Contact Form', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('');
     // Navigate to contact section
-    await page.click('nav a[href="#contact"]');
+    await page.click('nav a[href*="#contact"]');
     await page.waitForTimeout(500);
   });
 
@@ -73,8 +73,8 @@ test.describe('Contact Form', () => {
     await messageInput.fill('Hello World');
 
     // Look for character counter
-    const charCounter = page.locator('#char-count, [id*="char"], text=/\\d+\\/500/');
-    await expect(charCounter.first()).toBeVisible();
+    const charCounter = page.locator('#char-count');
+    await expect(charCounter).toBeVisible();
   });
 
   test('should enable submit button when form is valid', async ({ page }) => {

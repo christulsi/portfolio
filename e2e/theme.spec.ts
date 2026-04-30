@@ -2,12 +2,12 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Theme Toggle', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('');
   });
 
   test('should have a theme toggle button', async ({ page }) => {
     const themeToggle = page.locator(
-      'button[aria-label*="theme" i], button:has-text("Dark"), button:has-text("Light")'
+      'button[aria-label*="dark mode" i], button[aria-label*="theme" i], button:has-text("Dark"), button:has-text("Light")'
     );
     await expect(themeToggle.first()).toBeVisible();
   });
@@ -15,7 +15,9 @@ test.describe('Theme Toggle', () => {
   test('should toggle between light and dark themes', async ({ page }) => {
     // Find the theme toggle button
     const themeToggle = page
-      .locator('button[aria-label*="theme" i], button:has-text("Dark"), button:has-text("Light")')
+      .locator(
+        'button[aria-label*="dark mode" i], button[aria-label*="theme" i], button:has-text("Dark"), button:has-text("Light")'
+      )
       .first();
 
     // Get initial theme
@@ -36,7 +38,9 @@ test.describe('Theme Toggle', () => {
 
   test('should persist theme preference in localStorage', async ({ page }) => {
     const themeToggle = page
-      .locator('button[aria-label*="theme" i], button:has-text("Dark"), button:has-text("Light")')
+      .locator(
+        'button[aria-label*="dark mode" i], button[aria-label*="theme" i], button:has-text("Dark"), button:has-text("Light")'
+      )
       .first();
 
     // Toggle theme
@@ -55,7 +59,9 @@ test.describe('Theme Toggle', () => {
 
   test('should restore theme on page reload', async ({ page }) => {
     const themeToggle = page
-      .locator('button[aria-label*="theme" i], button:has-text("Dark"), button:has-text("Light")')
+      .locator(
+        'button[aria-label*="dark mode" i], button[aria-label*="theme" i], button:has-text("Dark"), button:has-text("Light")'
+      )
       .first();
 
     // Set to dark theme
@@ -79,7 +85,9 @@ test.describe('Theme Toggle', () => {
 
   test('should update Three.js colors when theme changes', async ({ page }) => {
     const themeToggle = page
-      .locator('button[aria-label*="theme" i], button:has-text("Dark"), button:has-text("Light")')
+      .locator(
+        'button[aria-label*="dark mode" i], button[aria-label*="theme" i], button:has-text("Dark"), button:has-text("Light")'
+      )
       .first();
 
     // Wait for Three.js to load
