@@ -26,18 +26,6 @@ export default {
         'shake': 'shake 0.4s ease-in-out',
         'slide-in-right': 'slideInRight 0.4s ease-out',
         'fade-in-up': 'fadeInUp 0.6s ease-out both',
-        'fade-in-up-1': 'fadeInUp 0.6s ease-out 0.1s both',
-        'fade-in-up-2': 'fadeInUp 0.6s ease-out 0.2s both',
-        'fade-in-up-3': 'fadeInUp 0.6s ease-out 0.3s both',
-        'fade-in-up-4': 'fadeInUp 0.6s ease-out 0.4s both',
-        'fade-in-up-5': 'fadeInUp 0.6s ease-out 0.5s both',
-        'fade-in-up-6': 'fadeInUp 0.6s ease-out 0.6s both',
-        'fade-in-up-7': 'fadeInUp 0.6s ease-out 0.7s both',
-        'fade-in-up-8': 'fadeInUp 0.6s ease-out 0.8s both',
-        'fade-in-up-9': 'fadeInUp 0.6s ease-out 0.9s both',
-        'fade-in-up-10': 'fadeInUp 0.6s ease-out 1.0s both',
-        'fade-in-up-11': 'fadeInUp 0.6s ease-out 1.1s both',
-        'fade-in-up-12': 'fadeInUp 0.6s ease-out 1.2s both',
       },
       keyframes: {
         float: {

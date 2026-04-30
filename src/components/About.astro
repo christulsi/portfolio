@@ -48,10 +48,14 @@ const categories = skillEntries.map((entry) => entry.data);
               <div>
                 <h4 class="text-primary text-lg mb-4">{category.name}</h4>
                 <div class="flex flex-wrap gap-3">
-                  {category.skills.map((skill, skillIndex) => {
-                    const animIndex = Math.min(catIndex * 6 + skillIndex + 1, 12);
-                    return <span class={`skill-tag animate-fade-in-up-${animIndex}`}>{skill}</span>;
-                  })}
+                  {category.skills.map((skill, skillIndex) => (
+                    <span
+                      class="skill-tag animate-fade-in-up"
+                      style={`animation-delay: ${(catIndex * 6 + skillIndex) * 100}ms;`}
+                    >
+                      {skill}
+                    </span>
+                  ))}
                 </div>
               </div>
             ))
@@ -67,6 +71,7 @@ const categories = skillEntries.map((entry) => entry.data);
     @apply bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900
            px-5 py-2.5 rounded-full text-sm font-semibold border-2 border-gray-200 dark:border-gray-700
            transition-all duration-300 relative overflow-hidden;
+    isolation: isolate;
   }
 
   .skill-tag::before {

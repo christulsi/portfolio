@@ -24,7 +24,8 @@ const certifications = certificationEntries.map((entry) => entry.data);
       {
         certifications.map((cert, index) => (
           <div
-            class={`relative bg-white/60 dark:bg-gray-800/40 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-3xl p-6 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10 dark:hover:shadow-primary/20 group overflow-hidden animate-fade-in-up-${Math.min(index + 1, 12)}`}
+            class="relative bg-white/60 dark:bg-gray-800/40 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-3xl p-6 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10 dark:hover:shadow-primary/20 group overflow-hidden animate-fade-in-up"
+            style={`animation-delay: ${index * 100}ms;`}
           >
             {/* Gradient accent left bar */}
             <div class="absolute top-0 left-0 bottom-0 w-1.5 bg-gradient-to-b from-primary via-purple-500 to-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -45,6 +46,7 @@ const certifications = certificationEntries.map((entry) => entry.data);
                   href={cert.verifyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={`Verify ${cert.name}`}
                   class="text-sm text-primary hover:text-primary-dark font-medium flex items-center gap-1"
                 >
                   Verify

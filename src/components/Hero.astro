@@ -61,6 +61,8 @@ const base = import.meta.env.BASE_URL ?? '/';
               width="300"
               height="300"
               viewBox="0 0 300 300"
+              aria-hidden="true"
+              focusable="false"
               class="w-[200px] h-[200px] md:w-[260px] md:h-[260px]"
             >
               <circle cx="150" cy="150" r="140" class="fill-primary opacity-20"></circle>
@@ -77,23 +79,29 @@ const base = import.meta.env.BASE_URL ?? '/';
 </section>
 
 <script>
-  // Import the Three.js entry point directly as a module
-  import '../scripts/three-hero-entry.js';
+  // Dynamically load Three.js only when the device can run it well. Keeps the
+  // ~150KB three.js bundle out of the main entry chunk.
+  function maybeLoadThree() {
+    try {
+      if (localStorage.getItem('disableThree') === '1') return;
+      const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+      if (conn?.saveData) return;
+      if (window.innerWidth < 640) return;
+      void import('../scripts/three/index.ts');
+    } catch (err) {
+      console.error('Failed to load Three.js animation:', err);
+    }
+  }
 
-  // Add ripple effect to enhanced buttons
-  document.addEventListener('DOMContentLoaded', () => {
-    const enhancedButtons = document.querySelectorAll('.btn-enhanced');
-
-    enhancedButtons.forEach((button) => {
+  function setupHero() {
+    maybeLoadThree();
+    document.querySelectorAll<HTMLElement>('.btn-enhanced').forEach((button) => {
       button.addEventListener('click', function (this: HTMLElement) {
-        // Add ripple class
         this.classList.add('ripple');
-
-        // Remove class after animation completes
-        setTimeout(() => {
-          this.classList.remove('ripple');
-        }, 600);
+        setTimeout(() => this.classList.remove('ripple'), 600);
       });
     });
-  });
+  }
+
+  document.addEventListener('astro:page-load', setupHero);
 </script>

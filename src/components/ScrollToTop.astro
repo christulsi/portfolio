@@ -20,25 +20,25 @@
 </button>
 
 <script>
-  const scrollToTopBtn = document.getElementById('scroll-to-top');
+  // Window-scoped state — listeners are attached once and persist across SPA navigations.
   let isVisible = false;
   let ticking = false;
 
   function updateButtonVisibility() {
+    const btn = document.getElementById('scroll-to-top');
     const shouldShow = window.scrollY > 300;
     if (shouldShow && !isVisible) {
-      scrollToTopBtn?.classList.remove('opacity-0', 'invisible');
-      scrollToTopBtn?.classList.add('opacity-100', 'visible');
+      btn?.classList.remove('opacity-0', 'invisible');
+      btn?.classList.add('opacity-100', 'visible');
       isVisible = true;
     } else if (!shouldShow && isVisible) {
-      scrollToTopBtn?.classList.add('opacity-0', 'invisible');
-      scrollToTopBtn?.classList.remove('opacity-100', 'visible');
+      btn?.classList.add('opacity-0', 'invisible');
+      btn?.classList.remove('opacity-100', 'visible');
       isVisible = false;
     }
     ticking = false;
   }
 
-  // Show/hide button based on scroll position - optimized with RAF
   window.addEventListener(
     'scroll',
     () => {
@@ -50,11 +50,9 @@
     { passive: true }
   );
 
-  // Scroll to top when clicked
-  scrollToTopBtn?.addEventListener('click', () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+  document.addEventListener('astro:page-load', () => {
+    document
+      .getElementById('scroll-to-top')
+      ?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
   });
 </script>

@@ -3,6 +3,7 @@ import { SEO } from 'astro-seo';
 import { ClientRouter } from 'astro:transitions';
 
 import Toast from '../components/Toast.astro';
+import { personJsonLd } from '../data/structured-data';
 
 interface Props {
   title: string;
@@ -18,8 +19,11 @@ const {
   type = 'website',
 } = Astro.props;
 
+const base = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const imageURL = new URL(`/portfolio${image.replace(/^\//, '')}`, Astro.site);
+const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
 ---
 
 <!doctype html>
@@ -79,84 +83,18 @@ const imageURL = new URL(`/portfolio${image.replace(/^\//, '')}`, Astro.site);
       }}
     />
 
-    <!-- Favicons -->
-    <link rel="icon" type="image/svg+xml" href={new URL('/portfolio/favicon.svg', Astro.site)} />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href={new URL('/portfolio/favicon-base.svg', Astro.site)}
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href={new URL('/portfolio/favicon-base.svg', Astro.site)}
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href={new URL('/portfolio/apple-touch-icon.svg', Astro.site)}
-    />
-    <link rel="manifest" href={new URL('/portfolio/site.webmanifest', Astro.site)} />
+    <!-- Favicons (relative to base — keeps manifest start_url same-origin in any env) -->
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="icon" type="image/png" sizes="32x32" href={`${base}favicon-base.svg`} />
+    <link rel="icon" type="image/png" sizes="16x16" href={`${base}favicon-base.svg`} />
+    <link rel="apple-touch-icon" sizes="180x180" href={`${base}apple-touch-icon.svg`} />
+    <link rel="manifest" href={`${base}site.webmanifest`} />
 
     <!-- View Transitions for smooth page navigation -->
     <ClientRouter />
 
     <!-- Structured Data (JSON-LD) for SEO -->
-    <script
-      type="application/ld+json"
-      set:html={JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'Person',
-        name: 'Chris Tulsi',
-        jobTitle: 'Senior ICT Engineer',
-        description:
-          'Software Engineer specializing in ERP systems, data engineering, and AI/ML solutions. AWS Certified Cloud Practitioner with expertise in building scalable software for government and enterprise clients.',
-        url: 'https://christulsi.github.io/portfolio',
-        image: 'https://christulsi.github.io/portfolio/og-image.png',
-        sameAs: ['https://github.com/christulsi', 'https://linkedin.com/in/christulsi'],
-        alumniOf: [
-          {
-            '@type': 'EducationalOrganization',
-            name: 'Nankai University',
-            description: "Master's Degree in Computer Software Engineering",
-          },
-          {
-            '@type': 'EducationalOrganization',
-            name: 'University of Guyana',
-            description: "Bachelor's Degree in Computer Science",
-          },
-        ],
-        hasCredential: {
-          '@type': 'EducationalOccupationalCredential',
-          name: 'AWS Certified Cloud Practitioner',
-          credentialCategory: 'certification',
-          recognizedBy: {
-            '@type': 'Organization',
-            name: 'Amazon Web Services',
-          },
-        },
-        knowsAbout: [
-          'Software Engineering',
-          'Cloud Computing',
-          'DevOps',
-          'Data Engineering',
-          'Artificial Intelligence',
-          'Machine Learning',
-          'ERP Systems',
-          'Python',
-          'JavaScript',
-          'AWS',
-          'Docker',
-          'CI/CD',
-        ],
-        worksFor: {
-          '@type': 'Organization',
-          name: 'National Data Management Authority',
-        },
-      })}
-    />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
 
     <!-- Inter font preloading for optimal performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -175,25 +113,17 @@ const imageURL = new URL(`/portfolio${image.replace(/^\//, '')}`, Astro.site);
     </noscript>
     <script is:inline>
       // Dark mode initialization (runs before page render to prevent flash)
-      // Priority: localStorage > system preference > dark fallback
-      const getDefaultTheme = () => {
+      // Priority: localStorage > system preference > light fallback
+      (() => {
         const stored = localStorage.getItem('theme');
-        if (stored) return stored;
-
-        // Check system preference
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          return 'dark';
+        if (stored === 'light' || stored === 'dark') {
+          document.documentElement.setAttribute('data-theme', stored);
+          return;
         }
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-          return 'light';
-        }
-
-        // Fallback to dark if no preference
-        return 'light';
-      };
-
-      const theme = getDefaultTheme();
-      document.documentElement.setAttribute('data-theme', theme);
+        const prefersDark =
+          window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+      })();
     </script>
   </head>
   <body>
@@ -202,38 +132,41 @@ const imageURL = new URL(`/portfolio${image.replace(/^\//, '')}`, Astro.site);
     <Toast />
     <slot />
     <script>
-      // Intersection Observer for scroll animations
-      const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px',
-      };
+      // Re-runs on every client-side navigation via ClientRouter, in addition to
+      // the initial page load. DOMContentLoaded would only fire once.
+      function setupPage() {
+        // Intersection Observer for fade-in elements
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+        );
+        document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
 
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target); // Stop observing after visible
-          }
-        });
-      }, observerOptions);
+        // Hash navigation after route change
+        if (location.hash) {
+          const id = location.hash.replace(/^#/, '');
+          setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 50);
+        }
+      }
 
-      // Observe all elements with fade-in class
-      document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
-
-      // Scroll progress indicator with performance optimization
+      // Single shared scroll handler for the progress bar; attached once per
+      // document. ClientRouter persists window listeners across navigations.
       const scrollProgress = document.getElementById('scroll-progress');
       let ticking = false;
-
       function updateScrollProgress() {
         const windowHeight =
           document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrolled = window.scrollY / windowHeight;
-        if (scrollProgress) {
-          scrollProgress.style.transform = `scaleX(${scrolled})`;
-        }
+        const scrolled = windowHeight > 0 ? window.scrollY / windowHeight : 0;
+        if (scrollProgress) scrollProgress.style.transform = `scaleX(${scrolled})`;
         ticking = false;
       }
-
       window.addEventListener(
         'scroll',
         () => {
@@ -244,27 +177,14 @@ const imageURL = new URL(`/portfolio${image.replace(/^\//, '')}`, Astro.site);
         },
         { passive: true }
       );
-    </script>
-    <script>
-      // Ensure hash navigation scrolls correctly after SPA navigation or client routing.
-      function scrollToHash(h: string | null) {
-        if (!h) return;
-        const id = h.replace(/^#/, '');
-        const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }
-
-      document.addEventListener('DOMContentLoaded', () => {
-        if (location.hash) {
-          // small delay to allow content to render
-          setTimeout(() => scrollToHash(location.hash), 50);
+      window.addEventListener('hashchange', () => {
+        const id = location.hash.replace(/^#/, '');
+        if (id) {
+          setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 50);
         }
       });
 
-      window.addEventListener('hashchange', () => {
-        // delay to allow route/component updates
-        setTimeout(() => scrollToHash(location.hash), 50);
-      });
+      document.addEventListener('astro:page-load', setupPage);
     </script>
   </body>
 </html>

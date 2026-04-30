@@ -21,7 +21,7 @@ const projects = projectEntries.map((entry) => entry.data);
     <div class="grid md:grid-cols-2 gap-8">
       {
         projects.map((project, index) => (
-          <div class={`animate-fade-in-up-${Math.min(index + 1, 12)}`}>
+          <div class="animate-fade-in-up" style={`animation-delay: ${index * 100}ms;`}>
             <ProjectCard {...project} />
           </div>
         ))

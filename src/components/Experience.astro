@@ -22,7 +22,8 @@ const experiences = experienceEntries.map((entry) => entry.data);
       {
         experiences.map((exp, index) => (
           <div
-            class={`timeline-item relative pl-16 mb-12 md:pl-16 group animate-fade-in-up-${index + 1}`}
+            class="timeline-item relative pl-16 mb-12 md:pl-16 group animate-fade-in-up"
+            style={`animation-delay: ${index * 100}ms;`}
           >
             <div class="timeline-marker absolute left-[11px] top-0 w-5 h-5 rounded-full bg-gradient-to-br from-primary to-secondary border-[3px] border-white dark:border-gray-900 shadow-[0_0_0_4px_rgba(59,130,246,0.2)] dark:shadow-[0_0_0_4px_rgba(59,130,246,0.3)] md:left-[11px] group-hover:scale-125 transition-all duration-500 group-hover:shadow-[0_0_0_6px_rgba(59,130,246,0.3)]" />
             <div class="relative bg-white/60 dark:bg-gray-800/40 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 rounded-3xl p-8 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/10 dark:hover:shadow-primary/20 overflow-hidden">
@@ -42,7 +43,8 @@ const experiences = experienceEntries.map((entry) => entry.data);
               <ul class="list-none p-0 space-y-2">
                 {exp.achievements.map((achievement, achIndex) => (
                   <li
-                    class={`text-gray-700 dark:text-gray-300 pl-7 relative before:content-['✓'] before:absolute before:left-0 before:text-primary before:font-bold before:text-lg animate-fade-in-up-${Math.min(index * 4 + achIndex + 1, 12)}`}
+                    class="text-gray-700 dark:text-gray-300 pl-7 relative before:content-['✓'] before:absolute before:left-0 before:text-primary before:font-bold before:text-lg animate-fade-in-up"
+                    style={`animation-delay: ${(index * 4 + achIndex) * 100}ms;`}
                   >
                     {achievement}
                   </li>

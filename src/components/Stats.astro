@@ -31,33 +31,27 @@ const stats = [
     start: number,
     end: number,
     duration: number,
-    suffix: string = '',
-    decimals: number = 0
+    suffix = '',
+    decimals = 0
   ) => {
     const range = end - start;
-    const steps = Math.max(1, Math.round(duration / 16));
-    const increment = range / steps;
-    let current = start;
+    const startTime = performance.now();
+    const format = (v: number) => (decimals > 0 ? v.toFixed(decimals) : Math.round(v).toString());
 
-    const format = (v: number) => {
-      return decimals > 0 ? v.toFixed(decimals) : Math.round(v).toString();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - startTime) / duration);
+      // Ease-out cubic for a snappier finish
+      const eased = 1 - Math.pow(1 - t, 3);
+      element.textContent = format(start + range * eased) + suffix;
+      if (t < 1) requestAnimationFrame(tick);
+      else element.textContent = format(end) + suffix;
     };
-
-    let step = 0;
-    const timer = setInterval(() => {
-      step++;
-      current = start + increment * step;
-      if (step >= steps) {
-        element.textContent = format(end) + suffix;
-        clearInterval(timer);
-      } else {
-        element.textContent = format(current) + suffix;
-      }
-    }, 16);
+    requestAnimationFrame(tick);
   };
 
-  const observeStats = () => {
+  const setupStats = () => {
     const statNumbers = document.querySelectorAll('.stat-number');
+    if (!statNumbers.length) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -65,33 +59,20 @@ const stats = [
           if (entry.isIntersecting && !entry.target.classList.contains('animated')) {
             entry.target.classList.add('animated');
             const target = entry.target.getAttribute('data-target') || '0';
-            const hasPlus = target.includes('+');
-            const hasPercent = target.includes('%');
-            // Extract numeric portion, allowing decimals
             const numericMatch = target.match(/[0-9]+(?:\.[0-9]+)?/);
             const numValue = numericMatch ? parseFloat(numericMatch[0]) : 0;
-
-            let suffix = '';
-            let decimals = 0;
-            if (hasPlus) suffix = '+';
-            if (hasPercent) suffix = '%';
-            // If the number includes a decimal, preserve one or more decimals
-            if (numericMatch && numericMatch[0].includes('.')) {
-              const parts = numericMatch[0].split('.');
-              if (parts[1]) {
-                decimals = Math.min(2, parts[1].length);
-              }
-            }
-
+            const suffix = target.includes('+') ? '+' : target.includes('%') ? '%' : '';
+            const decimalPart = numericMatch?.[0].split('.')[1];
+            const decimals = decimalPart ? Math.min(2, decimalPart.length) : 0;
             animateValue(entry.target as HTMLElement, 0, numValue, 2000, suffix, decimals);
           }
         });
       },
       { threshold: 0.5 }
     );
-
     statNumbers.forEach((stat) => observer.observe(stat));
   };
 
-  observeStats();
+  // Re-runs on every client-side navigation
+  document.addEventListener('astro:page-load', setupStats);
 </script>

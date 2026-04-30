@@ -1,4 +1,5 @@
 import { DirectionalLight, PerspectiveCamera, Scene, WebGLRenderer } from 'three';
+import type { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 
 import {
   CAMERA_FAR,
@@ -58,7 +59,7 @@ export function handleResize(
   root: HTMLElement,
   camera: PerspectiveCamera,
   renderer: WebGLRenderer,
-  composer: any
+  composer: EffectComposer | null
 ): void {
   const w = root.clientWidth;
   const h = root.clientHeight || 300;

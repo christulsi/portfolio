@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { PerspectiveCamera, Scene, Vector2, WebGLRenderer } from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
@@ -10,26 +10,21 @@ import { BLOOM_RADIUS, BLOOM_STRENGTH, BLOOM_THRESHOLD } from './constants';
  * Returns null if post-processing fails to initialize
  */
 export function createComposer(
-  renderer: THREE.WebGLRenderer,
-  scene: THREE.Scene,
-  camera: THREE.PerspectiveCamera,
+  renderer: WebGLRenderer,
+  scene: Scene,
+  camera: PerspectiveCamera,
   width: number,
   height: number
 ): { composer: EffectComposer; bloomPass: UnrealBloomPass } | null {
   try {
     const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
 
-    // Add render pass
-    const renderPass = new RenderPass(scene, camera);
-    composer.addPass(renderPass);
-
-    // Add bloom pass with conservative settings
-    // These settings provide visual enhancement with <15% GPU overhead
     const bloomPass = new UnrealBloomPass(
-      new THREE.Vector2(width, height),
-      BLOOM_STRENGTH, // reduced from typical 1.5
-      BLOOM_RADIUS, // reduced from typical 0.8
-      BLOOM_THRESHOLD // only bright particles
+      new Vector2(width, height),
+      BLOOM_STRENGTH,
+      BLOOM_RADIUS,
+      BLOOM_THRESHOLD
     );
     composer.addPass(bloomPass);
 

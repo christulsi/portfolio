@@ -117,12 +117,18 @@ const base = import.meta.env.BASE_URL;
   <Footer />
 
   <script>
-    import threeEntryUrl from '../scripts/three-hero-entry.js?url';
-
-    // Dynamically load the Three.js script for background
-    const script = document.createElement('script');
-    script.type = 'module';
-    script.src = threeEntryUrl;
-    document.head.appendChild(script);
+    // Lazy-load the Three.js animation only when conditions allow
+    function maybeLoadThree() {
+      try {
+        if (localStorage.getItem('disableThree') === '1') return;
+        const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+        if (conn?.saveData) return;
+        if (window.innerWidth < 640) return;
+        void import('../scripts/three/index.ts');
+      } catch (err) {
+        console.error('Failed to load Three.js animation:', err);
+      }
+    }
+    document.addEventListener('astro:page-load', maybeLoadThree);
   </script>
 </Layout>
