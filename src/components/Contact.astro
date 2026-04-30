@@ -136,122 +136,90 @@ import { Icon } from 'astro-icon/components';
 </section>
 
 <script>
-  const form = document.getElementById('contact-form') as HTMLFormElement;
-  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
-  const submitText = document.getElementById('submit-text') as HTMLSpanElement;
-  const submitLoading = document.getElementById('submit-loading') as HTMLSpanElement;
+  import { ContactFormSchema, validateContactForm } from '@schemas/form.schema';
+  import {
+    clearFieldValidation,
+    serializeForm,
+    showFieldError,
+    showFieldSuccess,
+  } from '@utils/form';
 
-  const nameInput = document.getElementById('name') as HTMLInputElement;
-  const emailInput = document.getElementById('email') as HTMLInputElement;
-  const messageInput = document.getElementById('message') as HTMLTextAreaElement;
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement | null;
+  const submitText = document.getElementById('submit-text');
+  const submitLoading = document.getElementById('submit-loading');
+  const charCount = document.getElementById('char-count');
 
-  const nameError = document.getElementById('name-error') as HTMLParagraphElement;
-  const emailError = document.getElementById('email-error') as HTMLParagraphElement;
-  const messageError = document.getElementById('message-error') as HTMLParagraphElement;
+  const nameInput = document.getElementById('name') as HTMLInputElement | null;
+  const emailInput = document.getElementById('email') as HTMLInputElement | null;
+  const messageInput = document.getElementById('message') as HTMLTextAreaElement | null;
 
-  const nameIcon = document.getElementById('name-icon') as HTMLDivElement;
-  const emailIcon = document.getElementById('email-icon') as HTMLDivElement;
+  // Per-field validation icons (presentational; not part of @utils/form)
+  const checkIconSvg =
+    '<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>';
+  const errorIconSvg =
+    '<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>';
 
-  const charCount = document.getElementById('char-count') as HTMLSpanElement;
+  function setFieldIcon(fieldId: string, kind: 'success' | 'error' | 'hidden') {
+    const icon = document.getElementById(`${fieldId}-icon`);
+    if (!icon) return;
+    if (kind === 'hidden') {
+      icon.classList.add('hidden');
+      icon.innerHTML = '';
+      return;
+    }
+    icon.innerHTML = kind === 'success' ? checkIconSvg : errorIconSvg;
+    icon.classList.remove('hidden');
+  }
+
+  /**
+   * Validate a single field against its Zod sub-schema.
+   * Returns true when valid; updates DOM either way.
+   */
+  function validateField(fieldId: 'name' | 'email' | 'message', value: string): boolean {
+    // Don't show validation state for an untouched empty field — match prior UX
+    if (value.length === 0) {
+      clearFieldValidation(fieldId);
+      setFieldIcon(fieldId, 'hidden');
+      return false;
+    }
+    const result = ContactFormSchema.shape[fieldId].safeParse(value);
+    if (result.success) {
+      showFieldSuccess(fieldId);
+      // Message field doesn't have a check icon in the markup
+      if (fieldId !== 'message') setFieldIcon(fieldId, 'success');
+      return true;
+    }
+    showFieldError(fieldId, result.error.errors[0]?.message ?? 'Invalid value');
+    if (fieldId !== 'message') setFieldIcon(fieldId, 'error');
+    return false;
+  }
 
   // Character counter for message
   messageInput?.addEventListener('input', () => {
-    charCount.textContent = messageInput.value.length.toString();
+    if (charCount) charCount.textContent = messageInput.value.length.toString();
   });
 
-  // Validation icons
-  const checkIcon =
-    '<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>';
-  const errorIcon =
-    '<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>';
+  // Real-time validation: on blur first, then on input after the field has been touched
+  const blurred = { name: false, email: false, message: false };
 
-  // Validation functions
-  function validateName() {
-    const isValid = nameInput.value.trim().length >= 2;
-    if (nameInput.value.length > 0) {
-      if (isValid) {
-        nameInput.classList.remove('field-invalid');
-        nameInput.classList.add('field-valid');
-        nameIcon.innerHTML = checkIcon;
-        nameIcon.classList.remove('hidden');
-        nameError.classList.add('hidden');
-      } else {
-        nameInput.classList.remove('field-valid');
-        nameInput.classList.add('field-invalid');
-        nameIcon.innerHTML = errorIcon;
-        nameIcon.classList.remove('hidden');
-        nameError.classList.remove('hidden');
-      }
-    }
-    return isValid;
+  function attachFieldValidation(
+    fieldId: 'name' | 'email' | 'message',
+    el: HTMLInputElement | HTMLTextAreaElement | null
+  ) {
+    if (!el) return;
+    el.addEventListener('blur', () => {
+      blurred[fieldId] = true;
+      validateField(fieldId, el.value);
+    });
+    el.addEventListener('input', () => {
+      if (blurred[fieldId]) validateField(fieldId, el.value);
+    });
   }
 
-  function validateEmail() {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const isValid = emailRegex.test(emailInput.value);
-    if (emailInput.value.length > 0) {
-      if (isValid) {
-        emailInput.classList.remove('field-invalid');
-        emailInput.classList.add('field-valid');
-        emailIcon.innerHTML = checkIcon;
-        emailIcon.classList.remove('hidden');
-        emailError.classList.add('hidden');
-      } else {
-        emailInput.classList.remove('field-valid');
-        emailInput.classList.add('field-invalid');
-        emailIcon.innerHTML = errorIcon;
-        emailIcon.classList.remove('hidden');
-        emailError.classList.remove('hidden');
-      }
-    }
-    return isValid;
-  }
-
-  function validateMessage() {
-    const isValid = messageInput.value.trim().length >= 10;
-    if (messageInput.value.length > 0) {
-      if (isValid) {
-        messageInput.classList.remove('field-invalid');
-        messageInput.classList.add('field-valid');
-        messageError.classList.add('hidden');
-      } else {
-        messageInput.classList.remove('field-valid');
-        messageInput.classList.add('field-invalid');
-        messageError.classList.remove('hidden');
-      }
-    }
-    return isValid;
-  }
-
-  // Add validation on blur (after first interaction)
-  nameInput?.addEventListener('blur', validateName);
-  emailInput?.addEventListener('blur', validateEmail);
-  messageInput?.addEventListener('blur', validateMessage);
-
-  // Add real-time validation on input (after first blur)
-  let nameBlurred = false;
-  let emailBlurred = false;
-  let messageBlurred = false;
-
-  nameInput?.addEventListener('blur', () => {
-    nameBlurred = true;
-  });
-  emailInput?.addEventListener('blur', () => {
-    emailBlurred = true;
-  });
-  messageInput?.addEventListener('blur', () => {
-    messageBlurred = true;
-  });
-
-  nameInput?.addEventListener('input', () => {
-    if (nameBlurred) validateName();
-  });
-  emailInput?.addEventListener('input', () => {
-    if (emailBlurred) validateEmail();
-  });
-  messageInput?.addEventListener('input', () => {
-    if (messageBlurred) validateMessage();
-  });
+  attachFieldValidation('name', nameInput);
+  attachFieldValidation('email', emailInput);
+  attachFieldValidation('message', messageInput);
 
   // Ripple effect on submit button
   submitBtn?.addEventListener('click', function (this: HTMLElement) {
@@ -263,16 +231,28 @@ import { Icon } from 'astro-icon/components';
     }
   });
 
+  function showToast(detail: {
+    message: string;
+    type: 'success' | 'error' | 'info';
+    duration?: number;
+  }) {
+    window.dispatchEvent(new CustomEvent('toast:show', { detail }));
+  }
+
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (!form || !submitBtn || !submitText || !submitLoading) return;
 
-    // Validate all fields
-    const nameValid = validateName();
-    const emailValid = validateEmail();
-    const messageValid = validateMessage();
+    // Source of truth: Zod schema. Surfaces all field errors at once.
+    const data = serializeForm(form);
+    const result = validateContactForm(data);
 
-    if (!nameValid || !emailValid || !messageValid) {
-      (window as any).showToast({
+    if (!result.success) {
+      (Object.keys(result.errors) as Array<'name' | 'email' | 'message'>).forEach((field) => {
+        showFieldError(field, result.errors[field] ?? 'Invalid value');
+        if (field !== 'message') setFieldIcon(field, 'error');
+      });
+      showToast({
         message: 'Please fix the errors in the form',
         type: 'error',
         duration: 5000,
@@ -285,10 +265,8 @@ import { Icon } from 'astro-icon/components';
     submitText.classList.add('hidden');
     submitLoading.classList.remove('hidden');
 
-    const formData = new FormData(form);
-
     try {
-      // Using FormSubmit.co - free, no signup required
+      // Using FormSubmit.co — free, no signup required
       const response = await fetch('https://formsubmit.co/christulsi@gmail.com', {
         method: 'POST',
         headers: {
@@ -296,41 +274,35 @@ import { Icon } from 'astro-icon/components';
           Accept: 'application/json',
         },
         body: JSON.stringify({
-          name: formData.get('name'),
-          email: formData.get('email'),
-          message: formData.get('message'),
-          _subject: `Portfolio Contact from ${formData.get('name')}`,
+          name: result.data.name,
+          email: result.data.email,
+          message: result.data.message,
+          _subject: `Portfolio Contact from ${result.data.name}`,
           _captcha: 'false',
         }),
       });
 
-      if (response.ok) {
-        // Success toast
-        (window as any).showToast({
-          message: 'Thank you! Your message has been sent successfully.',
-          type: 'success',
-          duration: 5000,
-        });
-        form.reset();
-        // Reset validation states
-        nameInput.classList.remove('field-valid', 'field-invalid');
-        emailInput.classList.remove('field-valid', 'field-invalid');
-        messageInput.classList.remove('field-valid', 'field-invalid');
-        nameIcon.classList.add('hidden');
-        emailIcon.classList.add('hidden');
-        charCount.textContent = '0';
-      } else {
-        throw new Error('Form submission failed');
-      }
-    } catch (error) {
-      // Error toast
-      (window as any).showToast({
+      if (!response.ok) throw new Error('Form submission failed');
+
+      showToast({
+        message: 'Thank you! Your message has been sent successfully.',
+        type: 'success',
+        duration: 5000,
+      });
+      form.reset();
+      (['name', 'email', 'message'] as const).forEach((field) => {
+        clearFieldValidation(field);
+        if (field !== 'message') setFieldIcon(field, 'hidden');
+        blurred[field] = false;
+      });
+      if (charCount) charCount.textContent = '0';
+    } catch {
+      showToast({
         message: 'Oops! Something went wrong. Please try again or email me directly.',
         type: 'error',
         duration: 5000,
       });
     } finally {
-      // Reset button state
       submitBtn.disabled = false;
       submitText.classList.remove('hidden');
       submitLoading.classList.add('hidden');
