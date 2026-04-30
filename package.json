@@ -24,7 +24,6 @@
     "analyze": "vite-bundle-visualizer"
   },
   "dependencies": {
-    "@astrojs/partytown": "^2.1.4",
     "@astrojs/sitemap": "^3.6.0",
     "@iconify-json/heroicons": "^1.2.3",
     "astro": "^5.15.3",
