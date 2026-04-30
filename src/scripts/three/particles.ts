@@ -8,12 +8,11 @@ import { generateCloud, generateFibonacciSphere, generateSeedArray, generateToru
  * Falls back to synchronous generation if Worker is not available
  */
 export function generateParticlePositions(geometry: BufferGeometry): Worker | null {
-  let worker: Worker | null = null;
-  const useWorker = typeof Worker !== 'undefined';
-
-  if (useWorker) {
+  if (typeof Worker !== 'undefined') {
     try {
-      worker = new Worker(new URL('../three-hero-worker.js', import.meta.url), { type: 'module' });
+      const worker = new Worker(new URL('../three-hero-worker.js', import.meta.url), {
+        type: 'module',
+      });
 
       worker.postMessage({ particleCount: PARTICLE_COUNT });
 
@@ -41,7 +40,6 @@ export function generateParticlePositions(geometry: BufferGeometry): Worker | nu
       return worker;
     } catch (e) {
       console.warn('Worker initialization failed, using fallback', e);
-      worker = null;
     }
   }
 

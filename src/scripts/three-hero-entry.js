@@ -2,7 +2,7 @@
 // This file is imported via `?url` from the Astro component, so Vite will
 // emit a single module file that includes the client and its dependencies.
 
-/* eslint-disable func-names, import/extensions */
+/* eslint-disable import/extensions */
 (async function () {
   try {
     const disabled = localStorage.getItem('disableThree') === '1';

@@ -70,7 +70,6 @@ export function mapRange(
 /**
  * Easing functions
  */
-/* eslint-disable no-plusplus, no-param-reassign */
 export const easing = {
   linear: (t: number): number => t,
 
@@ -126,7 +125,6 @@ export const easing = {
     return 1 + 16 * t1 * t1 * t1 * t1 * t1;
   },
 } as const;
-/* eslint-enable no-plusplus, no-param-reassign */
 
 /**
  * Animate a value over time with easing
