@@ -29,7 +29,7 @@
     "astro": "^5.15.3",
     "astro-compress": "^2.3.8",
     "astro-icon": "^1.1.5",
-    "astro-seo": "^0.8.4",
+    "astro-seo": "^1.1.0",
     "three": "^0.181.0"
   },
   "devDependencies": {
