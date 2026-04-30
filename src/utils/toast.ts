@@ -59,7 +59,6 @@ export class ToastManager {
     this.container = document.getElementById(containerId);
     this.maxToasts = maxToasts;
     if (!this.container) {
-      // eslint-disable-next-line no-console
       console.warn(`Toast container "#${containerId}" not found`);
     }
   }
