@@ -22,7 +22,7 @@ A modern, responsive portfolio website built with [Astro](https://astro.build) -
 
 - **TypeScript**: Full type safety with strict mode enabled
 - **Code Quality**: ESLint + Prettier with pre-commit hooks
-- **Testing**: Vitest (unit) + Playwright (E2E) with 80% coverage threshold
+- **Testing**: Vitest (unit) + Playwright (E2E) — coverage thresholds enforced in `vitest.config.ts` (currently 45% lines / 50% functions / 40% branches / 45% statements)
 - **Validation**: Zod schemas for runtime type safety
 - **Modular**: Clean architecture with separation of concerns
 
@@ -71,12 +71,13 @@ portfolio-site/
 │   │   ├── ScrollToTop.astro
 │   │   ├── SectionDivider.astro
 │   │   └── Toast.astro
-│   ├── data/                   # JSON data files
-│   │   ├── projects.json
-│   │   ├── experiences.json
-│   │   ├── certifications.json
-│   │   ├── skills.json
-│   │   └── testimonials.json
+│   ├── content/                # Astro content collections (typed JSON)
+│   │   ├── config.ts           # Collection schemas (Zod)
+│   │   ├── projects/*.json
+│   │   ├── experiences/*.json
+│   │   ├── certifications/*.json
+│   │   ├── skills/*.json
+│   │   └── testimonials/*.json
 │   ├── layouts/
 │   │   └── Layout.astro       # Main page layout
 │   ├── pages/

@@ -97,27 +97,49 @@
         info: '<svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>',
       };
 
-      toast.innerHTML = `
-        <div class="flex items-start gap-3 p-4 rounded-xl border backdrop-blur-xl shadow-lg ${colors[type]} relative overflow-hidden">
-          ${icons[type]}
-          <p class="flex-grow text-sm font-medium">${message}</p>
-          <button class="toast-close flex-shrink-0 opacity-50 hover:opacity-100 transition-opacity" aria-label="Close">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-            </svg>
-          </button>
-          ${duration > 0 ? `<div class="toast-progress absolute bottom-0 left-0 h-1 bg-current opacity-30" style="animation: progress ${duration}ms linear forwards;"></div>` : ''}
-        </div>
-      `;
+      // Build the toast DOM safely. The icon SVGs and chrome are trusted
+      // static strings; the user-supplied `message` is inserted via
+      // textContent so it cannot inject HTML even if a caller passes
+      // untrusted input.
+      const wrapper = document.createElement('div');
+      wrapper.className = `flex items-start gap-3 p-4 rounded-xl border backdrop-blur-xl shadow-lg ${colors[type]} relative overflow-hidden`;
+
+      // Icon (static, type-controlled)
+      const iconHost = document.createElement('span');
+      iconHost.className = 'flex-shrink-0';
+      iconHost.innerHTML = icons[type];
+      wrapper.appendChild(iconHost);
+
+      // Message (user-supplied — must be textContent, never innerHTML)
+      const messageEl = document.createElement('p');
+      messageEl.className = 'flex-grow text-sm font-medium';
+      messageEl.textContent = message;
+      wrapper.appendChild(messageEl);
+
+      // Close button (static)
+      const closeBtn = document.createElement('button');
+      closeBtn.className =
+        'toast-close flex-shrink-0 opacity-50 hover:opacity-100 transition-opacity';
+      closeBtn.setAttribute('aria-label', 'Close');
+      closeBtn.innerHTML =
+        '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>';
+      wrapper.appendChild(closeBtn);
+
+      // Progress bar (only when duration > 0)
+      if (duration > 0) {
+        const progress = document.createElement('div');
+        progress.className = 'toast-progress absolute bottom-0 left-0 h-1 bg-current opacity-30';
+        progress.style.animation = `progress ${duration}ms linear forwards`;
+        wrapper.appendChild(progress);
+      }
+
+      toast.appendChild(wrapper);
 
       // Add close button event
-      const closeBtn = toast.querySelector('.toast-close');
-      if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-          const toastId = this.toasts.find((t) => t.element === toast)?.id;
-          if (toastId) this.dismiss(toastId);
-        });
-      }
+      closeBtn.addEventListener('click', () => {
+        const toastId = this.toasts.find((t) => t.element === toast)?.id;
+        if (toastId) this.dismiss(toastId);
+      });
 
       return toast;
     }
