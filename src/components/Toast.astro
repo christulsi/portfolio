@@ -170,9 +170,16 @@
   // Create global toast manager
   const toastManager = new ToastManager();
 
-  // Expose to window for easy access
-  (window as any).showToast = (options: ToastOptions) => toastManager.show(options);
-  (window as any).dismissAllToasts = () => toastManager.dismissAll();
+  // Public API: dispatch `toast:show` (CustomEvent<ToastOptions>) to display a
+  // toast, or `toast:dismiss-all` to clear the stack. Keeps the manager local
+  // to this module — no `(window as any)` globals.
+  window.addEventListener('toast:show', (ev: Event) => {
+    const detail = (ev as CustomEvent<ToastOptions>).detail;
+    if (detail) toastManager.show(detail);
+  });
+  window.addEventListener('toast:dismiss-all', () => {
+    toastManager.dismissAll();
+  });
 </script>
 
 <style>

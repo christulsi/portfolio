@@ -280,15 +280,12 @@ export default function initThreeHero(): void {
     }
   }
 
-  // Expose controls to window for external access
-  (window as any).startThree = start;
-  (window as any).stopThree = stop;
-  (window as any).disposeThree = dispose;
-
-  // Listen for custom toggle event
-  window.addEventListener('three:toggle', (ev: any) => {
-    const disabled = ev?.detail?.disabled === true;
-    if (disabled) {
+  // External callers control the animation by dispatching `three:toggle`.
+  // Direct start/stop/dispose are intentionally not exposed on `window` —
+  // they're internal to this module's lifecycle.
+  window.addEventListener('three:toggle', (ev: Event) => {
+    const { detail } = ev as CustomEvent<{ disabled?: boolean }>;
+    if (detail?.disabled === true) {
       stop();
     } else {
       start();
