@@ -1,9 +1,4 @@
-import {
-  DirectionalLight,
-  PerspectiveCamera,
-  Scene,
-  WebGLRenderer,
-} from 'three';
+import { DirectionalLight, PerspectiveCamera, Scene, WebGLRenderer } from 'three';
 
 import {
   CAMERA_FAR,

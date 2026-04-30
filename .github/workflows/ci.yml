@@ -33,8 +33,8 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
-      - name: Auto-format code
-        run: npm run format
+      - name: Check formatting
+        run: npm run format:check
 
       - name: TypeScript type checking
         run: npm run type-check
@@ -99,93 +99,10 @@ jobs:
           path: dist/
           retention-days: 1
 
-  # Job 4: E2E Tests (Disabled - run locally with: npm run test:e2e)
-  # e2e-tests:
-  #   name: E2E Tests
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       browser: [chromium, firefox, webkit]
-  #
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '20'
-  #         cache: 'npm'
-  #
-  #     - name: Install dependencies
-  #       run: npm ci
-  #
-  #     - name: Install Playwright browsers
-  #       run: npx playwright install --with-deps ${{ matrix.browser }}
-  #
-  #     - name: Download build artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: dist
-  #         path: dist/
-  #
-  #     - name: Run E2E tests
-  #       run: npx playwright test --project=${{ matrix.browser }}
-  #
-  #     - name: Upload test results
-  #       uses: actions/upload-artifact@v4
-  #       if: failure()
-  #       with:
-  #         name: playwright-report-${{ matrix.browser }}
-  #         path: playwright-report/
-  #         retention-days: 7
-  #
-  #     - name: Upload test videos
-  #       uses: actions/upload-artifact@v4
-  #       if: failure()
-  #       with:
-  #         name: test-videos-${{ matrix.browser }}
-  #         path: test-results/
-  #         retention-days: 7
+  # NOTE: E2E (Playwright) and performance/SEO checks run locally via
+  # `npm run test:e2e`. Re-enabling them in CI is tracked in tech-debt Phase 3.
 
-  # Job 5: Performance & SEO Tests (Disabled - run locally with: npm run test:e2e)
-  # performance-seo:
-  #   name: Performance & SEO Tests
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '20'
-  #         cache: 'npm'
-  #
-  #     - name: Install dependencies
-  #       run: npm ci
-  #
-  #     - name: Install Playwright
-  #       run: npx playwright install --with-deps chromium
-  #
-  #     - name: Download build artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: dist
-  #         path: dist/
-  #
-  #     - name: Run performance tests
-  #       run: npx playwright test e2e/performance.spec.ts --project=chromium
-  #
-  #     - name: Run SEO tests
-  #       run: npx playwright test e2e/seo.spec.ts --project=chromium
-
-  # Job 6: Deploy to GitHub Pages
+  # Job 4: Deploy to GitHub Pages
   deploy:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
