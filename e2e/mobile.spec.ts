@@ -1,6 +1,6 @@
 import { test, expect, devices } from '@playwright/test';
 
-test.use(devices['iPhone 12']);
+test.use(devices['Pixel 5']);
 
 test.describe('Mobile Navigation', () => {
   test.beforeEach(async ({ page }) => {
