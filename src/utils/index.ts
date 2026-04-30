@@ -8,3 +8,4 @@ export * from './theme';
 export * from './dom';
 export * from './animation';
 export * from './form';
+export * from './toast';

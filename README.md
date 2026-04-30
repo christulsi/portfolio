@@ -22,7 +22,7 @@ A modern, responsive portfolio website built with [Astro](https://astro.build) -
 
 - **TypeScript**: Full type safety with strict mode enabled
 - **Code Quality**: ESLint + Prettier with pre-commit hooks
-- **Testing**: Vitest (unit) + Playwright (E2E) — coverage thresholds enforced in `vitest.config.ts` (currently 45% lines / 50% functions / 40% branches / 45% statements)
+- **Testing**: Vitest (unit) + Playwright (E2E, chromium in CI) — coverage thresholds enforced in `vitest.config.ts` (currently 80% lines / 75% functions / 70% branches / 80% statements)
 - **Validation**: Zod schemas for runtime type safety
 - **Modular**: Clean architecture with separation of concerns
 
