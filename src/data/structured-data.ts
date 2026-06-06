@@ -11,7 +11,7 @@ export const personJsonLd = {
     'Software Engineer specializing in ERP systems, data engineering, and AI/ML solutions. AWS Certified Cloud Practitioner with expertise in building scalable software for government and enterprise clients.',
   url: 'https://christulsi.github.io/portfolio',
   image: 'https://christulsi.github.io/portfolio/og-image.png',
-  sameAs: ['https://github.com/christulsi', 'https://linkedin.com/in/christulsi'],
+  sameAs: ['https://github.com/christulsi', 'https://www.linkedin.com/in/chris-tulsi/'],
   alumniOf: [
     {
       '@type': 'EducationalOrganization',
