@@ -1,27 +1,27 @@
 import type * as THREE from 'three';
-import type { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import type { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
-export interface ThreeConfig {
-  particleCount: number;
-  pointSize: number;
-  enableBloom: boolean;
-  enablePointer: boolean;
+/**
+ * The drifting node field. `positions` and `velocities` are flat xyz arrays
+ * (length count*3); `positions` is mutated in place each frame and uploaded to
+ * the GPU.
+ */
+export interface NodeField {
+  positions: Float32Array;
+  velocities: Float32Array;
+  seeds: Float32Array;
+  count: number;
+  bounds: { x: number; y: number; z: number };
 }
 
-export interface ThreeState {
-  scene: THREE.Scene;
-  camera: THREE.PerspectiveCamera;
-  renderer: THREE.WebGLRenderer;
-  points: THREE.Points;
-  geometry: THREE.BufferGeometry;
-  material: THREE.ShaderMaterial;
-  composer: EffectComposer | null;
-  bloomPass: UnrealBloomPass | null;
-  rafId: number | null;
-  worker: Worker | null;
-  isVisible: boolean;
-  bloomEnabled: boolean;
+/**
+ * Cursor projected into world space at the z=0 plane. Drives both the
+ * cursor-link lines and the gentle attraction of nearby nodes.
+ */
+export interface Cursor {
+  x: number;
+  y: number;
+  z: number;
+  active: boolean;
 }
 
 export interface ColorScheme {
@@ -29,18 +29,16 @@ export interface ColorScheme {
   b: THREE.Color;
 }
 
-export interface PerformanceMetrics {
-  fpsFrameCount: number;
-  fpsLastTime: number;
-  currentFPS: number;
-  lowFPSCount: number;
-}
-
+/**
+ * Pointer/scroll interaction state. Pointer is tracked in normalized device
+ * coordinates (-1..1) so it can be reprojected to world space after any resize.
+ */
 export interface InteractionState {
-  pointerX: number;
-  pointerY: number;
-  targetRotY: number;
-  targetRotX: number;
+  ndcX: number;
+  ndcY: number;
+  pointerActive: boolean;
+  parallaxX: number;
+  parallaxY: number;
   scrollProgress: number;
   scrollTicking: boolean;
 }

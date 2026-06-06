@@ -3,9 +3,6 @@ const base = import.meta.env.BASE_URL ?? '/';
 ---
 
 <section class="min-h-[85vh] flex items-center bg-transparent py-24 relative overflow-hidden">
-  <!-- Three.js background -->
-  <div id="three-root" class="absolute inset-0 z-0" aria-hidden="true"></div>
-
   <!-- Decorative gradient orbs -->
   <div class="absolute inset-0 overflow-hidden pointer-events-none">
     <div
@@ -79,22 +76,9 @@ const base = import.meta.env.BASE_URL ?? '/';
 </section>
 
 <script>
-  // Dynamically load Three.js only when the device can run it well. Keeps the
-  // ~150KB three.js bundle out of the main entry chunk.
-  function maybeLoadThree() {
-    try {
-      if (localStorage.getItem('disableThree') === '1') return;
-      const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-      if (conn?.saveData) return;
-      if (window.innerWidth < 640) return;
-      void import('../scripts/three/index.ts');
-    } catch (err) {
-      console.error('Failed to load Three.js animation:', err);
-    }
-  }
-
+  // The constellation background is loaded site-wide from Layout.astro. This
+  // script only wires up the hero's button ripple effect.
   function setupHero() {
-    maybeLoadThree();
     document.querySelectorAll<HTMLElement>('.btn-enhanced').forEach((button) => {
       button.addEventListener('click', function (this: HTMLElement) {
         this.classList.add('ripple');

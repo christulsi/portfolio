@@ -127,6 +127,9 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
     </script>
   </head>
   <body>
+    <!-- Site-wide constellation background: fixed, behind all content, and
+         persisted across client-side navigations so it animates uninterrupted. -->
+    <div id="three-root" transition:persist aria-hidden="true"></div>
     <div id="scroll-progress" aria-hidden="true"></div>
     <a href="#main" class="skip-link">Skip to main content</a>
     <Toast />
@@ -185,6 +188,26 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
       });
 
       document.addEventListener('astro:page-load', setupPage);
+    </script>
+    <script>
+      // Lazy-load the constellation background only when the device can handle
+      // it. Keeps the three.js chunk out of the critical path and off small /
+      // data-saver devices. The #three-root element persists across navigations
+      // and the module guards against double-init, so re-importing on each
+      // page-load is effectively free.
+      function maybeLoadThree() {
+        try {
+          if (localStorage.getItem('disableThree') === '1') return;
+          const conn = (navigator as Navigator & { connection?: { saveData?: boolean } })
+            .connection;
+          if (conn?.saveData) return;
+          if (window.innerWidth < 640) return;
+          void import('../scripts/three/index.ts');
+        } catch (err) {
+          console.error('Failed to load constellation background:', err);
+        }
+      }
+      document.addEventListener('astro:page-load', maybeLoadThree);
     </script>
   </body>
 </html>
@@ -269,6 +292,15 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
 
     .btn-outline:hover {
       color: white !important;
+    }
+
+    /* Site-wide constellation background. Sits above the body gradient but
+       behind all page content; never intercepts pointer events. */
+    #three-root {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
     }
 
     /* Small utilities */
