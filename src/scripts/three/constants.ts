@@ -34,6 +34,9 @@ export const CURSOR_LINK_DISTANCE = 30; // nodes within this of the cursor link 
 // Motion
 export const NODE_DRIFT_SPEED = 2.2; // world units / second
 export const POINTER_ATTRACT = 0.9; // gentle pull of nearby nodes toward the cursor (0–1 per sec)
+// Minimum pointer travel (NDC units) per frame for attraction to apply. A resting
+// cursor skips attraction so nearby nodes never collapse into a bright knot.
+export const POINTER_MOVE_EPSILON = 0.0015;
 export const PARALLAX_AMOUNT = 5; // group offset from pointer, for depth feel
 export const PARALLAX_LERP = 0.05; // easing of the parallax offset
 export const SCROLL_ROTATION = 0.45; // radians of slow z-tilt across a full-page scroll

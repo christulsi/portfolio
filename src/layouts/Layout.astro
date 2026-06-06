@@ -112,6 +112,10 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
       />
     </noscript>
     <script is:inline>
+      // Mark that JS is available so scroll-reveal content can default to hidden
+      // only when it can actually be revealed (see `.fade-in` styles).
+      document.documentElement.classList.add('js');
+
       // Dark mode initialization (runs before page render to prevent flash)
       // Priority: localStorage > system preference > light fallback
       (() => {
@@ -230,7 +234,6 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
 
     body {
       @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:bg-gradient-to-br dark:from-gray-950 dark:via-slate-900 dark:to-gray-900 text-gray-900 dark:text-gray-50 leading-relaxed font-sans;
-      background-attachment: fixed;
     }
 
     h1,
@@ -270,6 +273,13 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
     .fade-in.visible {
       opacity: 1;
       transform: translateY(0);
+    }
+
+    /* No-JS fallback: if the IntersectionObserver never runs, content must still
+       be visible rather than stuck at opacity:0. */
+    html:not(.js) .fade-in {
+      opacity: 1;
+      transform: none;
     }
 
     .container {

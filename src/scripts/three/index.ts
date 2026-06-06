@@ -22,6 +22,7 @@ import {
   PARALLAX_AMOUNT,
   PARALLAX_LERP,
   POINTER_ATTRACT,
+  POINTER_MOVE_EPSILON,
   SCROLL_COLOR_INTENSITY_MIN,
   SCROLL_COLOR_INTENSITY_RANGE,
   SCROLL_ROTATION,
@@ -122,6 +123,8 @@ export default function initThreeHero(): void {
   let rafId: number | null = null;
   let lastTime = performance.now();
   let userDisabled = false;
+  let prevNdcX = 0;
+  let prevNdcY = 0;
 
   const reduceMotion = prefersReducedMotion();
   const staticOnly = reduceMotion || isDataSaverEnabled();
@@ -147,7 +150,7 @@ export default function initThreeHero(): void {
   }
 
   /** Advance node positions: drift, bounce off bounds, gentle cursor pull. */
-  function updateNodes(dt: number): void {
+  function updateNodes(dt: number, pointerMoving: boolean): void {
     const { positions, velocities, count, bounds } = field;
     const drift = NODE_DRIFT_SPEED * dt;
     const r = CURSOR_LINK_DISTANCE;
@@ -192,8 +195,9 @@ export default function initThreeHero(): void {
         vz = -vz;
       }
 
-      // Gentle attraction toward the cursor for nearby nodes.
-      if (cursor.active) {
+      // Gentle attraction toward the cursor for nearby nodes — only while the
+      // pointer is moving, so a resting cursor doesn't collapse nodes into a knot.
+      if (cursor.active && pointerMoving) {
         const dx = cursor.x - px;
         const dy = cursor.y - py;
         const dz = cursor.z - pz;
@@ -254,8 +258,14 @@ export default function initThreeHero(): void {
     const dt = Math.min((now - lastTime) / 1000, MAX_DELTA);
     lastTime = now;
 
+    const pointerMoving =
+      Math.abs(interactionState.ndcX - prevNdcX) + Math.abs(interactionState.ndcY - prevNdcY) >
+      POINTER_MOVE_EPSILON;
+    prevNdcX = interactionState.ndcX;
+    prevNdcY = interactionState.ndcY;
+
     projectCursor();
-    updateNodes(dt);
+    updateNodes(dt, pointerMoving);
 
     // Eased pointer parallax + scroll tilt on the whole group.
     interactionState.parallaxX +=
