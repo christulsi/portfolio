@@ -1,72 +1,81 @@
 import * as THREE from 'three';
 
 /**
- * Three.js Animation Constants
+ * Three.js Constellation Background Constants
+ *
+ * A site-wide network of drifting "nodes" connected by distance-faded lines.
+ * World-space extents (how wide/tall the field is) are derived from the camera
+ * at runtime — see `getVisibleHalfExtents` in core.ts — so the field always
+ * fills the viewport regardless of aspect ratio.
  */
 
-// Particle System
-export const PARTICLE_COUNT = 220;
-export const POINT_SIZE = 1.6;
+// Node (particle) System — actual count is chosen per-device at runtime
+// (see `pickNodeCount` in utils.ts); this is the upper bound used for buffer
+// preallocation and the O(n²) link scan.
+export const MAX_NODE_COUNT = 170;
 
-// Sphere Geometry
-export const SPHERE_RADIUS = 60;
+// Preallocation factor for the line vertex buffer. Worst case a node links to
+// several neighbours plus the cursor; 8 links/node is comfortably above the
+// realistic average of ~3–4 and caps memory at a few KB.
+export const MAX_LINKS_PER_NODE = 8;
 
-// Torus Geometry
-export const TORUS_MAJOR_RADIUS = 40;
-export const TORUS_MINOR_RADIUS = 15;
+// Depth of the field on the z-axis (half-extent). Gives the network parallax
+// depth without pushing nodes behind the camera.
+export const NODE_DEPTH = 26;
 
-// Animation Speeds
-export const ANIMATION_SPEED = 0.005;
-export const AUTO_ROTATION_Y_SPEED = 0.6;
-export const AUTO_ROTATION_X_AMPLITUDE = 0.12;
-export const ROTATION_LERP_SPEED = 0.08;
-export const COLOR_LERP_SPEED = 0.02;
+// Push nodes slightly past the visible edges so the network feels continuous
+// rather than framed by empty margins.
+export const NODE_MARGIN = 1.12;
 
-// Pointer Interaction
-export const POINTER_ROTATION_Y_MULTIPLIER = 0.6;
-export const POINTER_ROTATION_X_MULTIPLIER = 0.3;
+// Linking
+export const LINK_DISTANCE = 24; // nodes closer than this (world units) get a line
+export const CURSOR_LINK_DISTANCE = 30; // nodes within this of the cursor link to it
+
+// Motion
+export const NODE_DRIFT_SPEED = 2.2; // world units / second
+export const POINTER_ATTRACT = 0.9; // gentle pull of nearby nodes toward the cursor (0–1 per sec)
+export const PARALLAX_AMOUNT = 5; // group offset from pointer, for depth feel
+export const PARALLAX_LERP = 0.05; // easing of the parallax offset
+export const SCROLL_ROTATION = 0.45; // radians of slow z-tilt across a full-page scroll
+export const MAX_DELTA = 0.05; // clamp frame delta (s) so tab-switch jumps don't teleport nodes
+
+// Point Appearance
+export const POINT_SIZE = 2.6; // base size; scaled by depth + per-node seed in the shader
+
+// Color Transitions
+export const COLOR_LERP_SPEED = 0.04;
 
 // Scroll-based Effects
-export const SCROLL_COLOR_INTENSITY_MIN = 0.8;
-export const SCROLL_COLOR_INTENSITY_RANGE = 0.2;
-
-// Performance Monitoring
-export const FPS_CHECK_INTERVAL = 60; // frames
-export const LOW_FPS_THRESHOLD = 45;
-export const LOW_FPS_COUNT_THRESHOLD = 3;
-
-// Bloom Effect Settings
-export const BLOOM_STRENGTH = 0.4;
-export const BLOOM_RADIUS = 0.3;
-export const BLOOM_THRESHOLD = 0.8;
+export const SCROLL_COLOR_INTENSITY_MIN = 0.85;
+export const SCROLL_COLOR_INTENSITY_RANGE = 0.3;
 
 // Camera Settings
-export const CAMERA_FOV = 45;
+export const CAMERA_FOV = 60;
 export const CAMERA_NEAR = 0.1;
 export const CAMERA_FAR = 1000;
-export const CAMERA_POSITION_Z = 80;
+export const CAMERA_POSITION_Z = 70;
 
-// Renderer Settings
-export const MAX_PIXEL_RATIO = 2;
+// Renderer Settings — fixed full-viewport canvas, so keep DPR modest
+export const MAX_PIXEL_RATIO = 1.75;
 
-// Shader Morphing
-export const MORPH_SMOOTHSTEP_START = 0.3;
-export const MORPH_SMOOTHSTEP_END = 0.7;
-
-// Theme-aware Color Schemes
+// Theme-aware Color Schemes. Light values are a touch stronger so the network
+// stays visible over the pale light-mode background gradient.
 export const COLOR_SCHEMES = {
   light: {
-    a: new THREE.Color(0x3b82f6), // blue
-    b: new THREE.Color(0x8b5cf6), // purple
+    a: new THREE.Color(0x2563eb), // blue-600
+    b: new THREE.Color(0x7c3aed), // violet-600
   },
   dark: {
-    a: new THREE.Color(0x06b6d4), // cyan
-    b: new THREE.Color(0x7c3aed), // violet
+    a: new THREE.Color(0x22d3ee), // cyan-400
+    b: new THREE.Color(0x818cf8), // indigo-400
   },
 } as const;
 
-// Visibility Observer Settings
-export const VISIBILITY_THRESHOLD = 0.1;
+// Line opacity is theme-tuned — light mode needs a stronger line to read.
+export const LINK_OPACITY = {
+  light: 0.5,
+  dark: 0.34,
+} as const;
 
 // Resize Defaults
 export const MIN_HEIGHT = 300;

@@ -1,105 +1,256 @@
-import { AdditiveBlending, BufferAttribute, BufferGeometry, Color, ShaderMaterial } from 'three';
+import {
+  BufferAttribute,
+  BufferGeometry,
+  Color,
+  DynamicDrawUsage,
+  NormalBlending,
+  ShaderMaterial,
+} from 'three';
 
-import { PARTICLE_COUNT, SPHERE_RADIUS, TORUS_MAJOR_RADIUS, TORUS_MINOR_RADIUS } from './constants';
-import { generateCloud, generateFibonacciSphere, generateSeedArray, generateTorus } from './utils';
+import { POINT_SIZE } from './constants';
+import type { Cursor, NodeField } from './types';
 
 /**
- * Generate particle positions using a Web Worker for better performance
- * Falls back to synchronous generation if Worker is not available
+ * Generate the node field: random positions, drift velocities and per-node
+ * seeds, all within the given world-space half-extents. Synchronous because a
+ * couple hundred nodes is sub-millisecond work — no worker needed.
  */
-export function generateParticlePositions(geometry: BufferGeometry): Worker | null {
-  if (typeof Worker !== 'undefined') {
-    try {
-      const worker = new Worker(new URL('../three-hero-worker.js', import.meta.url), {
-        type: 'module',
-      });
+export function generateNodes(
+  count: number,
+  bounds: { x: number; y: number; z: number }
+): NodeField {
+  const positions = new Float32Array(count * 3);
+  const velocities = new Float32Array(count * 3);
+  const seeds = new Float32Array(count);
 
-      worker.postMessage({ particleCount: PARTICLE_COUNT });
+  for (let i = 0; i < count; i++) {
+    positions[i * 3 + 0] = (Math.random() * 2 - 1) * bounds.x;
+    positions[i * 3 + 1] = (Math.random() * 2 - 1) * bounds.y;
+    positions[i * 3 + 2] = (Math.random() * 2 - 1) * bounds.z;
 
-      worker.addEventListener('message', (ev) => {
-        const buf = ev.data?.positions;
-        const sphereBuf = ev.data?.spherePositions;
-        const torusBuf = ev.data?.torusPositions;
+    // Random direction; z drifts more slowly to keep depth changes gentle.
+    velocities[i * 3 + 0] = Math.random() * 2 - 1;
+    velocities[i * 3 + 1] = Math.random() * 2 - 1;
+    velocities[i * 3 + 2] = (Math.random() * 2 - 1) * 0.4;
 
-        if (buf) {
-          const positions = new Float32Array(buf);
-          geometry.setAttribute('position', new BufferAttribute(positions, 3));
-        }
-
-        if (sphereBuf) {
-          const spherePositions = new Float32Array(sphereBuf);
-          geometry.setAttribute('aSpherePosition', new BufferAttribute(spherePositions, 3));
-        }
-
-        if (torusBuf) {
-          const torusPositions = new Float32Array(torusBuf);
-          geometry.setAttribute('aTorusPosition', new BufferAttribute(torusPositions, 3));
-        }
-      });
-
-      return worker;
-    } catch (e) {
-      console.warn('Worker initialization failed, using fallback', e);
-    }
+    seeds[i] = Math.random();
   }
 
-  // Fallback: generate positions synchronously
-  generateParticlePositionsFallback(geometry);
-  return null;
+  return { positions, velocities, seeds, count, bounds };
 }
 
 /**
- * Fallback method to generate particle positions synchronously
+ * Build the points geometry. The position attribute is marked dynamic because
+ * we rewrite it every frame as the nodes drift; the attribute is returned so the
+ * caller can flag `needsUpdate` without re-looking-it-up each frame.
  */
-function generateParticlePositionsFallback(geometry: BufferGeometry): void {
-  // Generate cloud positions
-  const positions = generateCloud(PARTICLE_COUNT);
-  geometry.setAttribute('position', new BufferAttribute(positions, 3));
-
-  // Generate sphere positions (Fibonacci sphere)
-  const spherePositions = generateFibonacciSphere(PARTICLE_COUNT, SPHERE_RADIUS);
-  geometry.setAttribute('aSpherePosition', new BufferAttribute(spherePositions, 3));
-
-  // Generate torus positions
-  const torusPositions = generateTorus(PARTICLE_COUNT, TORUS_MAJOR_RADIUS, TORUS_MINOR_RADIUS);
-  geometry.setAttribute('aTorusPosition', new BufferAttribute(torusPositions, 3));
-}
-
-/**
- * Create and configure the particle geometry
- */
-export function createParticleGeometry(): BufferGeometry {
+export function createPointsGeometry(field: NodeField): {
+  geometry: BufferGeometry;
+  positionAttr: BufferAttribute;
+} {
   const geometry = new BufferGeometry();
 
-  // Add per-particle seed attribute for randomization
-  const seedArray = generateSeedArray(PARTICLE_COUNT);
-  geometry.setAttribute('aSeed', new BufferAttribute(seedArray, 1));
+  const positionAttr = new BufferAttribute(field.positions, 3);
+  positionAttr.setUsage(DynamicDrawUsage);
+  geometry.setAttribute('position', positionAttr);
 
-  return geometry;
+  geometry.setAttribute('aSeed', new BufferAttribute(field.seeds, 1));
+
+  return { geometry, positionAttr };
+}
+
+export interface PointsUniforms {
+  // Index signature lets the object satisfy three's `{ [uniform: string]: IUniform }`
+  // while the named members keep precise types at the call sites.
+  [uniform: string]: { value: unknown };
+  uTime: { value: number };
+  uPointSize: { value: number };
+  uColorA: { value: Color };
+  uColorB: { value: Color };
+  uColorIntensity: { value: number };
 }
 
 /**
- * Create the particle material with shader uniforms
+ * Build the points (node) material.
  */
-export function createParticleMaterial(
+export function createPointsMaterial(
   colorA: Color,
   colorB: Color,
   vertexShader: string,
   fragmentShader: string
-): ShaderMaterial {
-  return new ShaderMaterial({
-    uniforms: {
-      uTime: { value: 0 },
-      uPointSize: { value: 1.6 },
-      uColorA: { value: colorA.clone() },
-      uColorB: { value: colorB.clone() },
-      uColorIntensity: { value: 1.0 },
-      uMorphFactor: { value: 0.0 }, // 0 = sphere, 1 = torus
-    },
+): { material: ShaderMaterial; uniforms: PointsUniforms } {
+  const uniforms: PointsUniforms = {
+    uTime: { value: 0 },
+    uPointSize: { value: POINT_SIZE },
+    uColorA: { value: colorA.clone() },
+    uColorB: { value: colorB.clone() },
+    uColorIntensity: { value: 1.0 },
+  };
+
+  const material = new ShaderMaterial({
+    uniforms,
     vertexShader,
     fragmentShader,
     transparent: true,
     depthTest: true,
-    blending: AdditiveBlending,
+    depthWrite: false,
+    blending: NormalBlending,
   });
+
+  return { material, uniforms };
+}
+
+/**
+ * Preallocated dynamic geometry for the connection lines. We never resize these
+ * buffers; instead we rewrite the first `linkCount * 2` vertices each frame and
+ * move the draw range.
+ */
+export interface LineBuffers {
+  geometry: BufferGeometry;
+  positions: Float32Array;
+  alphas: Float32Array;
+  positionAttr: BufferAttribute;
+  alphaAttr: BufferAttribute;
+  maxVertices: number;
+}
+
+export function createLineBuffers(maxLinks: number): LineBuffers {
+  const maxVertices = maxLinks * 2;
+  const positions = new Float32Array(maxVertices * 3);
+  const alphas = new Float32Array(maxVertices);
+
+  const geometry = new BufferGeometry();
+
+  const positionAttr = new BufferAttribute(positions, 3);
+  positionAttr.setUsage(DynamicDrawUsage);
+  geometry.setAttribute('position', positionAttr);
+
+  const alphaAttr = new BufferAttribute(alphas, 1);
+  alphaAttr.setUsage(DynamicDrawUsage);
+  geometry.setAttribute('aLineAlpha', alphaAttr);
+
+  geometry.setDrawRange(0, 0);
+
+  return { geometry, positions, alphas, positionAttr, alphaAttr, maxVertices };
+}
+
+export interface LineUniforms {
+  [uniform: string]: { value: unknown };
+  uLineColor: { value: Color };
+  uLineOpacity: { value: number };
+}
+
+/**
+ * Build the line (connection) material.
+ */
+export function createLineMaterial(
+  lineColor: Color,
+  opacity: number,
+  vertexShader: string,
+  fragmentShader: string
+): { material: ShaderMaterial; uniforms: LineUniforms } {
+  const uniforms: LineUniforms = {
+    uLineColor: { value: lineColor.clone() },
+    uLineOpacity: { value: opacity },
+  };
+
+  const material = new ShaderMaterial({
+    uniforms,
+    vertexShader,
+    fragmentShader,
+    transparent: true,
+    depthTest: true,
+    depthWrite: false,
+    blending: NormalBlending,
+  });
+
+  return { material, uniforms };
+}
+
+/**
+ * Rebuild the connection lines for the current frame.
+ *
+ * Scans every node pair (O(n²) — trivial for a few hundred nodes) plus the
+ * cursor, writing endpoints and a distance-based alpha into the preallocated
+ * buffers. Returns the number of vertices written so the caller can set the
+ * draw range. Stops early if the buffer fills.
+ */
+export function computeLinks(
+  field: NodeField,
+  buffers: LineBuffers,
+  linkDistance: number,
+  cursor: Cursor,
+  cursorLinkDistance: number
+): number {
+  const { positions, count } = field;
+  const { positions: linePositions, alphas: lineAlphas, maxVertices } = buffers;
+
+  const linkDist2 = linkDistance * linkDistance;
+  const cursorDist2 = cursorLinkDistance * cursorLinkDistance;
+
+  let v = 0; // vertices written so far
+
+  for (let i = 0; i < count; i++) {
+    const i3 = i * 3;
+    const ix = positions[i3] ?? 0;
+    const iy = positions[i3 + 1] ?? 0;
+    const iz = positions[i3 + 2] ?? 0;
+
+    // Node-to-node links.
+    for (let j = i + 1; j < count; j++) {
+      const j3 = j * 3;
+      const jx = positions[j3] ?? 0;
+      const jy = positions[j3 + 1] ?? 0;
+      const jz = positions[j3 + 2] ?? 0;
+      const dx = ix - jx;
+      const dy = iy - jy;
+      const dz = iz - jz;
+      const d2 = dx * dx + dy * dy + dz * dz;
+
+      if (d2 < linkDist2) {
+        if (v + 2 > maxVertices) return v;
+        const alpha = 1 - Math.sqrt(d2) / linkDistance;
+
+        const o = v * 3;
+        linePositions[o] = ix;
+        linePositions[o + 1] = iy;
+        linePositions[o + 2] = iz;
+        linePositions[o + 3] = jx;
+        linePositions[o + 4] = jy;
+        linePositions[o + 5] = jz;
+
+        lineAlphas[v] = alpha;
+        lineAlphas[v + 1] = alpha;
+        v += 2;
+      }
+    }
+
+    // Cursor link — brighter than node-to-node so the pointer "draws in" nearby
+    // nodes.
+    if (cursor.active) {
+      const dx = ix - cursor.x;
+      const dy = iy - cursor.y;
+      const dz = iz - cursor.z;
+      const d2 = dx * dx + dy * dy + dz * dz;
+
+      if (d2 < cursorDist2) {
+        if (v + 2 > maxVertices) return v;
+        const alpha = Math.min(1, (1 - Math.sqrt(d2) / cursorLinkDistance) * 1.7);
+
+        const o = v * 3;
+        linePositions[o] = ix;
+        linePositions[o + 1] = iy;
+        linePositions[o + 2] = iz;
+        linePositions[o + 3] = cursor.x;
+        linePositions[o + 4] = cursor.y;
+        linePositions[o + 5] = cursor.z;
+
+        lineAlphas[v] = alpha;
+        lineAlphas[v + 1] = alpha;
+        v += 2;
+      }
+    }
+  }
+
+  return v;
 }

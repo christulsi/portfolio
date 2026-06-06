@@ -10,12 +10,7 @@ const base = import.meta.env.BASE_URL;
 <Layout title="404 - Page Not Found | Chris Tulsi">
   <Header />
   <main id="main">
-    <section
-      class="min-h-[80vh] flex items-center bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 py-24 relative overflow-hidden"
-    >
-      <!-- Three.js background -->
-      <div id="three-root" class="absolute inset-0 z-0" aria-hidden="true"></div>
-
+    <section class="min-h-[80vh] flex items-center bg-transparent py-24 relative overflow-hidden">
       <div class="container relative z-10">
         <div class="max-w-2xl mx-auto text-center fade-in">
           <!-- 404 Number with gradient -->
@@ -115,20 +110,4 @@ const base = import.meta.env.BASE_URL;
     </section>
   </main>
   <Footer />
-
-  <script>
-    // Lazy-load the Three.js animation only when conditions allow
-    function maybeLoadThree() {
-      try {
-        if (localStorage.getItem('disableThree') === '1') return;
-        const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-        if (conn?.saveData) return;
-        if (window.innerWidth < 640) return;
-        void import('../scripts/three/index.ts');
-      } catch (err) {
-        console.error('Failed to load Three.js animation:', err);
-      }
-    }
-    document.addEventListener('astro:page-load', maybeLoadThree);
-  </script>
 </Layout>
