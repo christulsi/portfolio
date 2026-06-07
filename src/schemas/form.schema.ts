@@ -40,7 +40,7 @@ export function validateContactForm(
 
   // Transform Zod errors into field-specific error messages
   const errors: Record<string, string> = {};
-  result.error.errors.forEach((err) => {
+  result.error.issues.forEach((err) => {
     const field = err.path[0];
     if (field && typeof field === 'string') {
       errors[field] = err.message;

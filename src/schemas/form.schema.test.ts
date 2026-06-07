@@ -59,8 +59,8 @@ describe('Contact Form Schema', () => {
       if (result.success) {
         expect(result.data.email).toBe('john@example.com');
       } else {
-        console.error('Validation errors:', result.error.errors);
-        throw new Error(`Validation should have succeeded: ${JSON.stringify(result.error.errors)}`);
+        console.error('Validation errors:', result.error.issues);
+        throw new Error(`Validation should have succeeded: ${JSON.stringify(result.error.issues)}`);
       }
     });
 
@@ -77,8 +77,8 @@ describe('Contact Form Schema', () => {
         expect(result.data.email).toBe('john@example.com');
         expect(result.data.message).toBe('This is a valid message with more than ten characters.');
       } else {
-        console.error('Validation errors:', result.error.errors);
-        throw new Error(`Validation should have succeeded: ${JSON.stringify(result.error.errors)}`);
+        console.error('Validation errors:', result.error.issues);
+        throw new Error(`Validation should have succeeded: ${JSON.stringify(result.error.issues)}`);
       }
     });
   });

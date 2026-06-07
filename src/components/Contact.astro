@@ -193,7 +193,7 @@ import { Icon } from 'astro-icon/components';
       if (fieldId !== 'message') setFieldIcon(fieldId, 'success');
       return true;
     }
-    showFieldError(fieldId, result.error.errors[0]?.message ?? 'Invalid value');
+    showFieldError(fieldId, result.error.issues[0]?.message ?? 'Invalid value');
     if (fieldId !== 'message') setFieldIcon(fieldId, 'error');
     return false;
   }
