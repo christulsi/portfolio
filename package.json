@@ -2,6 +2,9 @@
   "name": "portfolio-site",
   "type": "module",
   "version": "0.0.1",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -21,7 +24,8 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
-    "analyze": "vite-bundle-visualizer"
+    "analyze": "vite-bundle-visualizer",
+    "generate:images": "node scripts/generate-images.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.6.0",

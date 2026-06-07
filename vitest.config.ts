@@ -24,10 +24,10 @@ export default defineConfig({
       // Floors set just below current coverage so a small regression breaks
       // the build but small refactors don't. Raise as new tests land.
       thresholds: {
-        lines: 80,
-        functions: 75,
-        branches: 70,
-        statements: 80,
+        lines: 85,
+        functions: 80,
+        branches: 73,
+        statements: 85,
       },
     },
     include: ['src/**/*.{test,spec}.{js,ts}'],
