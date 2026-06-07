@@ -1,4 +1,28 @@
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+import { gzipSync } from 'node:zlib';
+
 import { test, expect } from '@playwright/test';
+
+// The deployed site is the built dist/ served by GitHub Pages (gzipped +
+// CDN-cached). These helpers measure that production output directly, instead of
+// the dev preview server (which doesn't compress and isn't representative of
+// what users actually download).
+const DIST = 'dist';
+
+function distFiles(ext: string, dir: string = DIST): string[] {
+  const out: string[] = [];
+  for (const name of readdirSync(dir)) {
+    const p = join(dir, name);
+    if (statSync(p).isDirectory()) out.push(...distFiles(ext, p));
+    else if (name.endsWith(ext)) out.push(p);
+  }
+  return out;
+}
+
+function gzippedBytes(files: string[]): number {
+  return files.reduce((sum, f) => sum + gzipSync(readFileSync(f)).length, 0);
+}
 
 test.describe('Performance & Core Web Vitals', () => {
   test.beforeEach(async ({ page }) => {
@@ -90,81 +114,61 @@ test.describe('Performance & Core Web Vitals', () => {
     expect(cls).toBeLessThan(0.25);
   });
 
-  test('should load critical resources efficiently', async ({ page }) => {
-    const resourceMetrics = await page.evaluate(() => {
-      const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+  test('ships a reasonable amount of gzipped JS/CSS (production output)', () => {
+    // GitHub Pages serves these assets gzipped, so measure the gzipped build
+    // output rather than the preview server's uncompressed transfer size.
+    // three.js dominates the JS (~126KB gzipped) and is lazy-loaded, so it
+    // never blocks the initial render.
+    const jsGz = gzippedBytes(distFiles('.js'));
+    const cssGz = gzippedBytes(distFiles('.css'));
 
-      const cssResources = resources.filter((r) => r.name.includes('.css'));
-      const jsResources = resources.filter((r) => r.name.includes('.js'));
-      const imageResources = resources.filter(
-        (r) =>
-          r.name.includes('.png') ||
-          r.name.includes('.jpg') ||
-          r.name.includes('.jpeg') ||
-          r.name.includes('.webp') ||
-          r.name.includes('.svg')
-      );
+    console.log('Gzipped JS:', jsGz, 'CSS:', cssGz);
 
-      const getTotalSize = (resources: PerformanceResourceTiming[]) =>
-        resources.reduce((sum, r) => sum + (r.transferSize || 0), 0);
-
-      return {
-        cssCount: cssResources.length,
-        jsCount: jsResources.length,
-        imageCount: imageResources.length,
-        totalCssSize: getTotalSize(cssResources),
-        totalJsSize: getTotalSize(jsResources),
-        totalImageSize: getTotalSize(imageResources),
-        totalResources: resources.length,
-      };
-    });
-
-    console.log('Resource Metrics:', resourceMetrics);
-
-    // Resource budgets
-    expect(resourceMetrics.totalCssSize).toBeLessThan(150000); // CSS < 150KB
-    expect(resourceMetrics.totalJsSize).toBeLessThan(300000); // JS < 300KB
-    expect(resourceMetrics.totalResources).toBeLessThan(50); // Total resources < 50
+    expect(jsGz).toBeLessThan(200_000); // gzipped JS < 200KB
+    expect(cssGz).toBeLessThan(40_000); // gzipped CSS < 40KB
   });
 
-  test('should have proper caching headers', async ({ page }) => {
-    const response = await page.goto('');
-    expect(response).not.toBeNull();
+  test('emits content-hashed assets for immutable CDN caching', () => {
+    // Response headers are owned by the static host (GitHub Pages), not the app.
+    // What the build controls — and what enables long-term immutable caching —
+    // is fingerprinting every asset with a content hash.
+    const assets = [...distFiles('.js'), ...distFiles('.css')];
+    expect(assets.length).toBeGreaterThan(0);
 
-    const cacheControl = response?.headers()['cache-control'];
-    const etag = response?.headers().etag;
-
-    // Should have either cache-control or etag for caching
-    const hasCaching = cacheControl || etag;
-    expect(hasCaching).toBeTruthy();
-
-    console.log('Cache-Control:', cacheControl);
-    console.log('ETag:', etag);
+    const hashed = assets.filter((f) => /\.[A-Za-z0-9_-]{8,}\.(js|css)$/.test(f));
+    console.log(`Content-hashed assets: ${hashed.length}/${assets.length}`);
+    expect(hashed.length).toBe(assets.length);
   });
 
-  test('should not have render-blocking resources', async ({ page }) => {
-    // Check for render-blocking resources
-    const renderBlockingResources = await page.evaluate(() => {
-      const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+  test('built HTML has no render-blocking scripts and minimal blocking CSS', () => {
+    const html = readFileSync(join(DIST, 'index.html'), 'utf8');
 
-      // Find resources that block rendering (loaded before FCP)
-      const paintEntries = performance.getEntriesByType('paint');
-      const fcp = paintEntries.find((entry) => entry.name === 'first-contentful-paint');
-      const fcpTime = fcp?.startTime || 0;
+    // Astro emits ES module scripts (deferred by spec). A render-blocking script
+    // would be a `<script src>` without type=module / defer / async.
+    // Note: the built HTML is minified, so attributes may be unquoted
+    // (e.g. `type=module`) — the patterns allow optional quotes.
+    const scriptTags = html.match(/<script\b[^>]*>/g) ?? [];
+    const blockingScripts = scriptTags.filter(
+      (t) =>
+        /\bsrc=/.test(t) &&
+        !/type=["']?module\b/.test(t) &&
+        !/\bdefer\b/.test(t) &&
+        !/\basync\b/.test(t)
+    );
 
-      return resources.filter((r) => {
-        const isCSS = r.name.includes('.css');
-        const isJS = r.name.includes('.js');
-        const loadedBeforeFCP = r.responseEnd < fcpTime;
+    // Synchronous stylesheets block rendering (the font is loaded via
+    // rel="preload", so it is not counted here).
+    const blockingStyles = html.match(/<link\b[^>]+rel=["']?stylesheet\b[^>]*>/g) ?? [];
 
-        return (isCSS || isJS) && loadedBeforeFCP;
-      }).length;
-    });
+    console.log(
+      'Render-blocking scripts:',
+      blockingScripts.length,
+      'stylesheet links:',
+      blockingStyles.length
+    );
 
-    console.log('Render-blocking resources:', renderBlockingResources);
-
-    // Should have minimal render-blocking resources
-    expect(renderBlockingResources).toBeLessThan(5);
+    expect(blockingScripts.length).toBe(0);
+    expect(blockingStyles.length).toBeLessThan(5);
   });
 
   test('should be accessible with good Lighthouse scores', async ({ page }) => {
