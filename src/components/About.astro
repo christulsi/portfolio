@@ -67,6 +67,9 @@ const categories = skillEntries.map((entry) => entry.data);
 </section>
 
 <style>
+  /* Scoped styles need a @reference to the Tailwind entry to use @apply in v4. */
+  @reference '../styles/global.css';
+
   .skill-tag {
     @apply bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900
            px-5 py-2.5 rounded-full text-sm font-semibold border-2 border-gray-200 dark:border-gray-700

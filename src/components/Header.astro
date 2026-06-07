@@ -4,7 +4,7 @@ import { Icon } from 'astro-icon/components';
 const base = import.meta.env.BASE_URL ?? '/';
 ---
 
-<header class="sticky top-0 bg-white/95 dark:bg-gray-900/95 shadow-sm z-[1000] transition-colors">
+<header class="sticky top-0 bg-white/95 dark:bg-gray-900/95 shadow-xs z-[1000] transition-colors">
   <nav class="container py-3 md:py-4">
     <div class="flex justify-between items-center">
       <a
@@ -12,7 +12,7 @@ const base = import.meta.env.BASE_URL ?? '/';
         class="flex items-center gap-3 text-2xl font-extrabold text-primary tracking-tight"
       >
         <span
-          class="inline-block w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white shadow"
+          class="inline-block w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white shadow-sm"
           >CT</span
         >
         <span class="sr-only">Home</span>
@@ -25,11 +25,11 @@ const base = import.meta.env.BASE_URL ?? '/';
         aria-expanded="false"
         aria-controls="nav-menu"
       >
-        <span class="w-6 h-0.5 bg-gray-900 dark:bg-gray-50 transition-all duration-300 rounded"
+        <span class="w-6 h-0.5 bg-gray-900 dark:bg-gray-50 transition-all duration-300 rounded-sm"
         ></span>
-        <span class="w-6 h-0.5 bg-gray-900 dark:bg-gray-50 transition-all duration-300 rounded"
+        <span class="w-6 h-0.5 bg-gray-900 dark:bg-gray-50 transition-all duration-300 rounded-sm"
         ></span>
-        <span class="w-6 h-0.5 bg-gray-900 dark:bg-gray-50 transition-all duration-300 rounded"
+        <span class="w-6 h-0.5 bg-gray-900 dark:bg-gray-50 transition-all duration-300 rounded-sm"
         ></span>
       </button>
       <!-- Mobile drawer backdrop: dims the page and closes the menu on click. -->
@@ -76,7 +76,7 @@ const base = import.meta.env.BASE_URL ?? '/';
         <div class="flex items-center gap-3">
           <button
             id="theme-toggle"
-            class="mt-auto md:mt-0 w-10 h-10 border-2 border-gray-200 dark:border-gray-700 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-primary transition-all shadow-sm"
+            class="mt-auto md:mt-0 w-10 h-10 border-2 border-gray-200 dark:border-gray-700 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-primary transition-all shadow-xs"
             aria-label="Toggle dark mode"
           >
             <Icon name="heroicons:sun-20-solid" class="sun-icon hidden dark:block w-5 h-5" />
