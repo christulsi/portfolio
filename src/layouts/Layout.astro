@@ -15,7 +15,7 @@ interface Props {
 const {
   title,
   description = 'Senior ICT Engineer specializing in ERP, data engineering, and AI/ML solutions. Building scalable software for government and enterprise.',
-  image = '/og-image.svg',
+  image = '/og-image.png',
   type = 'website',
 } = Astro.props;
 
@@ -85,9 +85,8 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
 
     <!-- Favicons (relative to base — keeps manifest start_url same-origin in any env) -->
     <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
-    <link rel="icon" type="image/png" sizes="32x32" href={`${base}favicon-base.svg`} />
-    <link rel="icon" type="image/png" sizes="16x16" href={`${base}favicon-base.svg`} />
-    <link rel="apple-touch-icon" sizes="180x180" href={`${base}apple-touch-icon.svg`} />
+    <link rel="icon" type="image/png" sizes="192x192" href={`${base}favicon-192x192.png`} />
+    <link rel="apple-touch-icon" sizes="180x180" href={`${base}apple-touch-icon.png`} />
     <link rel="manifest" href={`${base}site.webmanifest`} />
 
     <!-- View Transitions for smooth page navigation -->

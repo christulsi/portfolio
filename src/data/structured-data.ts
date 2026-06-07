@@ -2,6 +2,13 @@
  * JSON-LD Person schema for SEO. Imported into Layout.astro and stamped via
  * <script type="application/ld+json"> on every page.
  */
+
+// Derive the canonical origin from the Astro config (site + base) rather than
+// hardcoding it, so url/image can't drift if the domain or base path changes.
+const SITE = (import.meta.env.SITE ?? 'https://christulsi.github.io').replace(/\/+$/, '');
+const BASE = (import.meta.env.BASE_URL ?? '/').replace(/\/+$/, '');
+const SITE_URL = `${SITE}${BASE}`;
+
 export const personJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
@@ -9,8 +16,8 @@ export const personJsonLd = {
   jobTitle: 'Senior ICT Engineer',
   description:
     'Software Engineer specializing in ERP systems, data engineering, and AI/ML solutions. AWS Certified Cloud Practitioner with expertise in building scalable software for government and enterprise clients.',
-  url: 'https://christulsi.github.io/portfolio',
-  image: 'https://christulsi.github.io/portfolio/og-image.png',
+  url: SITE_URL,
+  image: `${SITE_URL}/og-image.png`,
   sameAs: ['https://github.com/christulsi', 'https://www.linkedin.com/in/chris-tulsi/'],
   alumniOf: [
     {
