@@ -65,8 +65,8 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
       }}
       extend={{
         meta: [
-          { name: 'theme-color', content: '#3b82f6' },
-          { name: 'msapplication-TileColor', content: '#3b82f6' },
+          { name: 'theme-color', content: '#0b0d11' },
+          { name: 'msapplication-TileColor', content: '#0b0d11' },
           { name: 'generator', content: Astro.generator },
           { name: 'author', content: 'Chris Tulsi' },
           {
@@ -97,18 +97,20 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
     <!-- Structured Data (JSON-LD) for SEO -->
     <script is:inline type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
 
-    <!-- Inter font preloading for optimal performance -->
+    <!-- Type system: Instrument Serif (display) + Hanken Grotesk (UI/body) +
+         JetBrains Mono (data/labels). Loaded non-blocking (preload → stylesheet)
+         with display=swap so first paint never waits on the network. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap"
       as="style"
       onload="this.onload=null;this.rel='stylesheet'"
     />
     <noscript>
       <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap"
         rel="stylesheet"
       />
     </noscript>
@@ -132,6 +134,9 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
     </script>
   </head>
   <body>
+    <!-- Blueprint grid + atmospheric depth. Sits at the very back; pure CSS,
+         theme-aware via custom properties. -->
+    <div id="bg-grid" aria-hidden="true"></div>
     <!-- Site-wide constellation background: fixed, behind all content, and
          persisted across client-side navigations so it animates uninterrupted. -->
     <div id="three-root" transition:persist aria-hidden="true"></div>

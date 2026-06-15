@@ -61,16 +61,17 @@ export const CAMERA_POSITION_Z = 70;
 // Renderer Settings — fixed full-viewport canvas, so keep DPR modest
 export const MAX_PIXEL_RATIO = 1.75;
 
-// Theme-aware Color Schemes. Light values are a touch stronger so the network
-// stays visible over the pale light-mode background gradient.
+// Theme-aware Color Schemes — "Instrument" palette: signal amber + terminal
+// teal. Light values are deeper so the network stays visible over the warm
+// bone background; dark values glow.
 export const COLOR_SCHEMES = {
   light: {
-    a: new THREE.Color(0x2563eb), // blue-600
-    b: new THREE.Color(0x7c3aed), // violet-600
+    a: new THREE.Color(0xb5740d), // deep amber
+    b: new THREE.Color(0x0d8478), // deep teal
   },
   dark: {
-    a: new THREE.Color(0x22d3ee), // cyan-400
-    b: new THREE.Color(0x818cf8), // indigo-400
+    a: new THREE.Color(0xf3b24b), // signal amber
+    b: new THREE.Color(0x5eead4), // terminal teal
   },
 } as const;
 
