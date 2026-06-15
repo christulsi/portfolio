@@ -1,73 +1,132 @@
 ---
 const base = import.meta.env.BASE_URL ?? '/';
+
+// Booted-up "terminal" readout. Pre-rendered in full so it is meaningful
+// without JS and never shifts layout; the load animation only staggers it in.
+const bootLines = [
+  { prompt: 'whoami', reply: 'chris tulsi — senior ict engineer' },
+  { prompt: 'cat stack.txt', reply: 'erpnext · data engineering · ai/ml' },
+  { prompt: '', reply: 'aws · devops · automation', cont: true },
+  { prompt: 'uptime', reply: '99.9% — systems nominal' },
+];
 ---
 
-<section class="min-h-[85vh] flex items-center bg-transparent py-24 relative overflow-hidden">
-  <!-- Decorative gradient orbs -->
-  <div class="absolute inset-0 overflow-hidden pointer-events-none">
-    <div
-      class="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-blue-400/30 to-purple-400/30 dark:from-blue-500/20 dark:to-purple-500/20 rounded-full blur-3xl animate-pulse"
-    >
-    </div>
-    <div
-      class="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-br from-indigo-400/30 to-pink-400/30 dark:from-indigo-500/20 dark:to-pink-500/20 rounded-full blur-3xl animate-pulse"
-      style="animation-delay: 1s;"
-    >
-    </div>
+<section
+  class="relative flex min-h-[88vh] items-center overflow-hidden py-24"
+  aria-label="Introduction"
+>
+  <!-- single intentional accent glow anchored behind the panel -->
+  <div
+    class="pointer-events-none absolute right-[-10%] top-1/4 h-[28rem] w-[28rem] rounded-full opacity-60 blur-3xl"
+    style="background: radial-gradient(circle, rgb(var(--glow) / 0.22), transparent 70%);"
+    aria-hidden="true"
+  >
   </div>
 
   <div class="container relative z-10">
-    <div class="grid md:grid-cols-2 gap-12 items-center">
-      <div class="fade-in">
-        <h1 class="text-4xl sm:text-5xl md:text-6xl leading-tight mb-3">
-          Hi, I'm <span
-            class="bg-gradient-to-r from-primary via-purple-500 to-secondary bg-clip-text text-transparent font-extrabold"
-            >Chris Tulsi</span
-          >
-        </h1>
-        <p class="text-xl text-gray-700 dark:text-gray-200 mb-6 font-semibold">Software Engineer</p>
-        <p
-          class="text-base sm:text-lg text-gray-700 dark:text-gray-300 mb-8 leading-relaxed max-w-2xl"
-        >
-          I build elegant, maintainable software and infrastructure solutions for government and
-          enterprise clients. My work focuses on reliability, automation, and developer
-          productivity.
+    <div class="grid items-center gap-12 md:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+      <!-- Left: identity -->
+      <div>
+        <p class="kicker animate-fade-in-up" style="animation-delay: 40ms;">
+          <span class="status-dot" aria-hidden="true"></span>
+          Senior ICT Engineer
         </p>
-        <div class="flex flex-col sm:flex-row gap-4">
-          <a href={`${base}#projects`} class="btn-primary btn-enhanced" id="view-projects-btn"
-            >View Projects</a
-          >
+
+        <h1
+          class="font-display mt-5 text-[clamp(2.75rem,1.6rem+5vw,5rem)] leading-[0.95] tracking-tight animate-fade-in-up"
+          style="animation-delay: 120ms;"
+        >
+          Chris Tulsi
+        </h1>
+
+        <p
+          class="mt-4 font-mono text-lg text-muted animate-fade-in-up sm:text-xl"
+          style="animation-delay: 240ms;"
+        >
+          <span class="text-primary">&gt;</span>
+          <span
+            id="role-typer"
+            data-roles="Software Engineer|Data Engineer|Cloud & DevOps|AI/ML Builder"
+            >Software Engineer</span
+          ><span class="type-caret" aria-hidden="true"></span>
+        </p>
+
+        <p
+          class="mt-7 max-w-xl text-base leading-relaxed text-muted animate-fade-in-up sm:text-lg"
+          style="animation-delay: 340ms;"
+        >
+          I build elegant, maintainable software and infrastructure for government and enterprise —
+          focused on reliability, automation, and developer productivity.
+        </p>
+
+        <div
+          class="mt-9 flex flex-col gap-4 animate-fade-in-up sm:flex-row"
+          style="animation-delay: 440ms;"
+        >
+          <a href={`${base}#projects`} class="btn-primary btn-enhanced" id="view-projects-btn">
+            View Projects
+            <span aria-hidden="true">→</span>
+          </a>
           <a href={`${base}#contact`} class="btn-outline btn-enhanced" id="get-in-touch-btn"
             >Get in Touch</a
           >
         </div>
+
+        <!-- mono stat strip -->
+        <dl
+          class="mt-12 flex flex-wrap gap-x-10 gap-y-4 border-t border-hairline/15 pt-6 font-mono text-sm animate-fade-in-up"
+          style="animation-delay: 560ms;"
+        >
+          <div>
+            <dt class="text-xs uppercase tracking-widest text-muted">Experience</dt>
+            <dd class="mt-1 text-primary">6+ years</dd>
+          </div>
+          <div>
+            <dt class="text-xs uppercase tracking-widest text-muted">Uptime</dt>
+            <dd class="mt-1 text-primary">99.9%</dd>
+          </div>
+          <div>
+            <dt class="text-xs uppercase tracking-widest text-muted">Based in</dt>
+            <dd class="mt-1 text-primary">Guyana</dd>
+          </div>
+        </dl>
       </div>
 
-      <div class="flex justify-center items-center relative">
-        <div class="relative">
-          <div
-            class="hidden md:block absolute -inset-8 rounded-3xl bg-gradient-to-br from-primary/20 via-purple-500/20 to-secondary/20 blur-3xl animate-pulse"
-            aria-hidden="true"
-            style="animation-delay: 0.5s;"
-          >
+      <!-- Right: terminal instrument panel -->
+      <div class="animate-fade-in-up md:justify-self-end" style="animation-delay: 300ms;">
+        <div class="terminal panel w-full max-w-md">
+          <div class="terminal-bar">
+            <span class="terminal-tick" aria-hidden="true"></span>
+            <span class="terminal-tick" aria-hidden="true"></span>
+            <span class="terminal-tick" aria-hidden="true"></span>
+            <span class="ml-2 font-mono text-xs text-muted">chris@ndma: ~/portfolio</span>
           </div>
-          <div
-            class="animate-float p-8 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 dark:border-gray-700/50 relative z-10"
-          >
-            <svg
-              width="300"
-              height="300"
-              viewBox="0 0 300 300"
-              aria-hidden="true"
-              focusable="false"
-              class="w-[200px] h-[200px] md:w-[260px] md:h-[260px]"
+          <div class="terminal-body font-mono">
+            {
+              bootLines.map((line, i) => (
+                <div class="term-row" style={`animation-delay: ${700 + i * 260}ms;`}>
+                  {!line.cont && line.prompt && (
+                    <div class="term-cmd">
+                      <span class="text-secondary">$</span> {line.prompt}
+                    </div>
+                  )}
+                  <div class="term-reply">
+                    <span class="text-primary" aria-hidden="true">
+                      ↳
+                    </span>{' '}
+                    {line.reply}
+                  </div>
+                </div>
+              ))
+            }
+            <div
+              class="term-row term-status"
+              style={`animation-delay: ${700 + bootLines.length * 260}ms;`}
             >
-              <circle cx="150" cy="150" r="140" class="fill-primary opacity-20"></circle>
-              <circle cx="150" cy="150" r="100" class="fill-secondary opacity-30"></circle>
-              <text x="150" y="160" text-anchor="middle" font-size="80" class="fill-primary"
-                >👨‍💻</text
-              >
-            </svg>
+              <span class="status-dot" aria-hidden="true"></span>
+              <span class="text-ink">available for work</span>
+              <span class="type-caret type-caret--solid" aria-hidden="true"></span>
+            </div>
           </div>
         </div>
       </div>
@@ -75,9 +134,166 @@ const base = import.meta.env.BASE_URL ?? '/';
   </div>
 </section>
 
+<style>
+  /* Live status dot — pulsing teal ring. */
+  .status-dot {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: rgb(var(--accent-2));
+    box-shadow: 0 0 0 0 rgb(var(--accent-2) / 0.6);
+    animation: statusPulse 2.4s ease-out infinite;
+  }
+
+  @keyframes statusPulse {
+    0% {
+      box-shadow: 0 0 0 0 rgb(var(--accent-2) / 0.55);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 7px rgb(var(--accent-2) / 0);
+    }
+  }
+
+  /* Typewriter caret for the role line. */
+  .type-caret {
+    display: inline-block;
+    width: 0.6em;
+    height: 1.05em;
+    margin-left: 0.1em;
+    vertical-align: -0.15em;
+    border-bottom: 2px solid rgb(var(--accent));
+    animation: caretBlink 1.1s steps(1) infinite;
+  }
+
+  .type-caret--solid {
+    width: 0.55em;
+    height: 1em;
+    border-bottom: none;
+    background: rgb(var(--accent));
+  }
+
+  @keyframes caretBlink {
+    0%,
+    50% {
+      opacity: 1;
+    }
+    50.01%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* Terminal panel */
+  .terminal {
+    overflow: hidden;
+    box-shadow: 0 30px 80px -40px rgb(var(--accent) / 0.45);
+  }
+
+  /* engineered corner ticks */
+  .terminal::before,
+  .terminal::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 1px solid rgb(var(--accent) / 0.5);
+    pointer-events: none;
+  }
+  .terminal::before {
+    top: 8px;
+    left: 8px;
+    border-right: 0;
+    border-bottom: 0;
+  }
+  .terminal::after {
+    bottom: 8px;
+    right: 8px;
+    border-left: 0;
+    border-top: 0;
+  }
+
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid rgb(var(--border) / 0.12);
+    background: rgb(var(--surface-2) / 0.6);
+  }
+
+  .terminal-tick {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 2px;
+    background: rgb(var(--text) / 0.18);
+  }
+  .terminal-tick:first-child {
+    background: rgb(var(--accent) / 0.85);
+  }
+
+  .terminal-body {
+    padding: 1.25rem 1.25rem 1.4rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    min-height: 16.5rem; /* reserve space so the staggered reveal can't shift layout */
+  }
+
+  .term-row {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: termIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .term-cmd {
+    color: rgb(var(--text));
+  }
+
+  .term-reply {
+    color: rgb(var(--text-muted));
+    margin: 0.15rem 0 0.7rem;
+  }
+
+  .term-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.4rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid rgb(var(--border) / 0.12);
+  }
+
+  @keyframes termIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* No-JS / reduced-motion: everything must be visible immediately. */
+  html:not(.js) .term-row,
+  html:not(.js) [style*='animation-delay'] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .status-dot,
+    .type-caret,
+    .term-row {
+      animation: none !important;
+    }
+    .term-row {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+</style>
+
 <script>
-  // The constellation background is loaded site-wide from Layout.astro. This
-  // script only wires up the hero's button ripple effect.
+  // Button ripple + a lightweight role typewriter. Both enhance the
+  // server-rendered markup; the page is fully functional without them.
   function setupHero() {
     document.querySelectorAll<HTMLElement>('.btn-enhanced').forEach((button) => {
       button.addEventListener('click', function (this: HTMLElement) {
@@ -85,6 +301,38 @@ const base = import.meta.env.BASE_URL ?? '/';
         setTimeout(() => this.classList.remove('ripple'), 600);
       });
     });
+
+    const typer = document.getElementById('role-typer');
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!typer || prefersReduced || typer.dataset.bound === '1') return;
+    typer.dataset.bound = '1';
+
+    const roles = (typer.dataset.roles || '').split('|').filter(Boolean);
+    if (roles.length < 2) return;
+
+    let roleIndex = 0;
+    let charIndex = (roles[0] ?? '').length; // start fully typed (matches SSR text)
+    let deleting = false;
+
+    const tick = () => {
+      const current = roles[roleIndex] ?? '';
+      charIndex += deleting ? -1 : 1;
+      typer.textContent = current.slice(0, charIndex);
+
+      let delay = deleting ? 45 : 90;
+      if (!deleting && charIndex === current.length) {
+        delay = 1600; // hold the finished word
+        deleting = true;
+      } else if (deleting && charIndex === 0) {
+        deleting = false;
+        roleIndex = (roleIndex + 1) % roles.length;
+        delay = 380;
+      }
+      window.setTimeout(tick, delay);
+    };
+
+    // Begin after the entrance settles.
+    window.setTimeout(tick, 2200);
   }
 
   document.addEventListener('astro:page-load', setupHero);

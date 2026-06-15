@@ -5,40 +5,64 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'Noto Sans', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'],
+        // Editorial display serif — high-contrast, characterful (hero + section titles).
+        display: ['"Instrument Serif"', 'ui-serif', 'Georgia', 'serif'],
+        // Neutral workhorse grotesque for body + UI.
+        sans: [
+          '"Hanken Grotesk"',
+          'ui-sans-serif',
+          'system-ui',
+          '-apple-system',
+          'Segoe UI',
+          'sans-serif',
+        ],
+        // Technical voice — kickers, labels, data readouts, the terminal panel.
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       colors: {
+        // Themed via CSS variables (see Layout.astro). Channel triplets let
+        // Tailwind's <alpha-value> opacity modifiers keep working
+        // (e.g. bg-primary/20, border-primary/30).
         primary: {
-          DEFAULT: '#3b82f6',
-          dark: '#2563eb',
-          light: '#60a5fa',
+          DEFAULT: 'rgb(var(--accent) / <alpha-value>)',
+          dark: 'rgb(var(--accent-strong) / <alpha-value>)',
+          light: 'rgb(var(--accent-light) / <alpha-value>)',
         },
         secondary: {
-          DEFAULT: '#8b5cf6',
-          light: '#a78bfa',
+          DEFAULT: 'rgb(var(--accent-2) / <alpha-value>)',
+          light: 'rgb(var(--accent-2-light) / <alpha-value>)',
         },
+        ink: 'rgb(var(--text) / <alpha-value>)',
+        muted: 'rgb(var(--text-muted) / <alpha-value>)',
+        canvas: 'rgb(var(--bg) / <alpha-value>)',
+        surface: {
+          DEFAULT: 'rgb(var(--surface) / <alpha-value>)',
+          raised: 'rgb(var(--surface-2) / <alpha-value>)',
+        },
+        hairline: 'rgb(var(--border) / <alpha-value>)',
+      },
+      letterSpacing: {
+        kicker: '0.28em',
       },
       animation: {
-        'float': 'float 3s ease-in-out infinite',
-        'shimmer': 'shimmer 2s ease-in-out infinite',
-        'wave': 'wave 10s ease-in-out infinite',
-        'ripple': 'ripple 0.6s ease-out',
-        'shake': 'shake 0.4s ease-in-out',
+        float: 'float 7s ease-in-out infinite',
+        shimmer: 'shimmer 2s ease-in-out infinite',
+        ripple: 'ripple 0.6s ease-out',
+        shake: 'shake 0.4s ease-in-out',
         'slide-in-right': 'slideInRight 0.4s ease-out',
-        'fade-in-up': 'fadeInUp 0.6s ease-out both',
+        'fade-in-up': 'fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both',
+        blink: 'blink 1.1s steps(1) infinite',
+        'sweep-down': 'sweepDown 9s ease-in-out infinite',
+        'scan-line': 'scanLine 6s linear infinite',
       },
       keyframes: {
         float: {
           '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-20px)' },
+          '50%': { transform: 'translateY(-14px)' },
         },
         shimmer: {
           '0%': { backgroundPosition: '-200% center' },
           '100%': { backgroundPosition: '200% center' },
-        },
-        wave: {
-          '0%, 100%': { transform: 'translateX(0)' },
-          '50%': { transform: 'translateX(10px)' },
         },
         ripple: {
           '0%': { transform: 'scale(0)', opacity: '0.5' },
@@ -54,11 +78,23 @@ export default {
           '100%': { transform: 'translateX(0)', opacity: '1' },
         },
         fadeInUp: {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
+          '0%': { transform: 'translateY(22px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        blink: {
+          '0%, 50%': { opacity: '1' },
+          '50.01%, 100%': { opacity: '0' },
+        },
+        sweepDown: {
+          '0%, 100%': { transform: 'translateY(-6%)' },
+          '50%': { transform: 'translateY(6%)' },
+        },
+        scanLine: {
+          '0%': { transform: 'translateY(-100%)' },
+          '100%': { transform: 'translateY(100%)' },
         },
       },
     },
   },
   plugins: [],
-}
+};
