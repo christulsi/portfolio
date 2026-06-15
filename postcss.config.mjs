@@ -1,11 +1,10 @@
 /**
- * PostCSS config — wires Tailwind 3 + Autoprefixer directly, replacing the
- * deprecated @astrojs/tailwind integration (which does not support Astro 6).
- * Tailwind reads tailwind.config.mjs automatically.
+ * PostCSS config — Tailwind CSS v4 via @tailwindcss/postcss. The Tailwind entry
+ * (@import "tailwindcss") and @config live in Layout.astro's global style block.
+ * v4 includes autoprefixing + nesting, so no separate autoprefixer is needed.
  */
 export default {
   plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
+    '@tailwindcss/postcss': {},
   },
 };
