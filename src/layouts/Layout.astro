@@ -193,12 +193,13 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
     }
 
     [data-theme='dark'] {
-      --canvas: 11 24 19; /* #0B1813 */
-      --surface: 17 35 28; /* #11231C */
-      --sunken: 24 47 38; /* #182F26 */
+      /* Deep forest, not near-black: the canvas is the light theme's ink. */
+      --canvas: 14 34 25; /* #0E2219 */
+      --surface: 20 48 39; /* #143027 */
+      --sunken: 27 58 47; /* #1B3A2F */
       --ink: 233 241 236; /* #E9F1EC */
       --muted: 159 182 171; /* #9FB6AB */
-      --line: 36 60 49; /* #243C31 */
+      --line: 42 74 61; /* #2A4A3D */
       --link: 244 196 48; /* gold reads as the link color on dark green */
       --forest: 15 84 59; /* #0F543B */
       color-scheme: dark;
@@ -255,11 +256,19 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
       }
     }
 
-    /* Archivo stretched to its widest cut — the site's one loud typographic move. */
+    /* Two-step type scale on Archivo's width axis. The widest, heaviest cut is
+       reserved for the name (and the wordmark/404 that echo it) — the site's one
+       loud typographic move. Headings step down in both width and weight. */
     .font-display {
       font-stretch: 125%;
       font-weight: 800;
       letter-spacing: -0.025em;
+    }
+
+    .font-heading {
+      font-stretch: 112%;
+      font-weight: 700;
+      letter-spacing: -0.02em;
     }
 
     .section {
@@ -271,9 +280,9 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
     }
 
     .section-title {
-      @apply font-display;
-      font-size: clamp(2.25rem, 5vw, 3.5rem);
-      line-height: 0.98;
+      @apply font-heading;
+      font-size: clamp(2rem, 4.2vw, 3.25rem);
+      line-height: 1.02;
     }
 
     .section-intro {

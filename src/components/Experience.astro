@@ -9,15 +9,16 @@ const experiences = sortByOrder((await getCollection('experiences')).map((entry)
 <section id="experience" class="section container" aria-labelledby="experience-title">
   <div class="section-head">
     <h2 id="experience-title" class="section-title">Experience</h2>
-    <p class="section-intro">Most recent first.</p>
   </div>
 
-  <ol class="tile tile-surface py-2 md:py-4">
+  <!-- A real sequence, so it gets a timeline rule: open on the canvas rather
+       than boxed in a tile. -->
+  <ol class="border-t border-line">
     {
       experiences.map((exp) => {
         const isCurrent = /present/i.test(exp.period);
         return (
-          <li class="grid gap-4 border-b border-line py-8 last:border-b-0 md:grid-cols-12 md:gap-8">
+          <li class="grid gap-4 border-b border-line py-8 md:grid-cols-12 md:gap-8 md:py-12">
             <div class="md:col-span-4 lg:col-span-3">
               <p class="font-semibold">{exp.period}</p>
               {isCurrent && (
@@ -28,12 +29,12 @@ const experiences = sortByOrder((await getCollection('experiences')).map((entry)
               )}
             </div>
             <div class="md:col-span-8 lg:col-span-9">
-              <h3 class="font-display text-2xl md:text-3xl">{exp.title}</h3>
+              <h3 class="font-heading text-2xl md:text-3xl">{exp.title}</h3>
               <p class="mt-1 font-medium text-muted">{exp.company}</p>
-              <p class="mt-4 max-w-prose">{exp.description}</p>
-              <ul class="mt-5 grid gap-2 md:grid-cols-2 md:gap-x-8">
+              <p class="mt-4 max-w-prose text-lg">{exp.description}</p>
+              <ul class="mt-6 grid max-w-4xl gap-x-10 gap-y-2 md:grid-cols-2">
                 {exp.achievements.map((achievement) => (
-                  <li class="relative pl-5 text-muted before:absolute before:left-0 before:top-[0.6em] before:h-2 before:w-2 before:rounded-sm before:bg-gold before:content-['']">
+                  <li class="relative pl-5 text-muted before:absolute before:left-0 before:top-[0.65em] before:h-1.5 before:w-1.5 before:rounded-full before:bg-muted before:content-['']">
                     {achievement}
                   </li>
                 ))}
