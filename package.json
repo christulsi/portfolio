@@ -34,7 +34,7 @@
     "astro-compress": "^2.4.3",
     "astro-icon": "^1.2.0",
     "astro-seo": "^1.2.0",
-    "three": "^0.184.0"
+    "three": "^0.186.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
@@ -45,7 +45,7 @@
     "@playwright/test": "^1.63.0",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/user-event": "^14.6.7",
-    "@types/three": "^0.184.0",
+    "@types/three": "^0.186.0",
     "@typescript-eslint/eslint-plugin": "^8.71.1",
     "@typescript-eslint/parser": "^8.71.1",
     "@vitest/coverage-v8": "^4.1.11",
