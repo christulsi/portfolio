@@ -4,6 +4,7 @@ export interface Experience {
   period: string;
   description: string;
   achievements: string[];
+  order?: number;
 }
 
 export interface Project {
@@ -12,6 +13,9 @@ export interface Project {
   technologies: string[];
   liveUrl?: string;
   githubUrl?: string;
+  client?: string;
+  outcome?: string;
+  order?: number;
 }
 
 export interface Certification {
@@ -21,6 +25,7 @@ export interface Certification {
   icon: string;
   credentialId?: string;
   verifyUrl?: string;
+  order?: number;
 }
 
 export interface Testimonial {

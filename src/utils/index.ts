@@ -9,3 +9,4 @@ export * from './dom';
 export * from './animation';
 export * from './form';
 export * from './toast';
+export * from './content';

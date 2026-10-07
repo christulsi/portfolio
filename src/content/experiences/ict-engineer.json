@@ -8,5 +8,6 @@
     "Optimized databases, improving query performance by 30%",
     "Automated deployment pipelines and implemented DevOps best practices",
     "Provided database administration, backup, and disaster recovery solutions"
-  ]
+  ],
+  "order": 2
 }

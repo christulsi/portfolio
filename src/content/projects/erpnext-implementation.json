@@ -2,5 +2,7 @@
   "title": "ERPNext Implementation & Customization",
   "description": "Deployed and customized ERPNext ERP software for government agencies, streamlining business processes, inventory management, and financial operations with tailored modules and workflows.",
   "technologies": ["ERPNext", "Python", "Frappe", "MariaDB", "JavaScript"],
-  "liveUrl": "https://erpnext.com"
+  "liveUrl": "https://erpnext.com",
+  "order": 2,
+  "client": "Government agencies"
 }
