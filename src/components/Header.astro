@@ -2,89 +2,76 @@
 import { Icon } from 'astro-icon/components';
 
 const base = import.meta.env.BASE_URL ?? '/';
+
+const links = [
+  { id: 'projects', label: 'Projects' },
+  { id: 'about', label: 'About' },
+  { id: 'experience', label: 'Experience' },
+  { id: 'contact', label: 'Contact' },
+];
 ---
 
-<header class="sticky top-0 bg-white/95 dark:bg-gray-900/95 shadow-sm z-[1000] transition-colors">
-  <nav class="container py-3 md:py-4">
-    <div class="flex justify-between items-center">
-      <a
-        href={base}
-        class="flex items-center gap-3 text-2xl font-extrabold text-primary tracking-tight"
-      >
-        <span
-          class="inline-block w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white shadow"
-          >CT</span
-        >
-        <span class="sr-only">Home</span>
-        <span class="ml-1">Chris Tulsi</span>
-      </a>
-      <button
-        id="mobile-menu-toggle"
-        class="mobile-menu-toggle md:hidden flex flex-col gap-1 p-2 z-[1001]"
-        aria-label="Toggle menu"
-        aria-expanded="false"
-        aria-controls="nav-menu"
-      >
-        <span class="w-6 h-0.5 bg-gray-900 dark:bg-gray-50 transition-all duration-300 rounded"
-        ></span>
-        <span class="w-6 h-0.5 bg-gray-900 dark:bg-gray-50 transition-all duration-300 rounded"
-        ></span>
-        <span class="w-6 h-0.5 bg-gray-900 dark:bg-gray-50 transition-all duration-300 rounded"
-        ></span>
-      </button>
-      <!-- Mobile drawer backdrop: dims the page and closes the menu on click. -->
-      <div
-        id="nav-backdrop"
-        class="fixed inset-0 z-40 bg-black/50 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"
-        aria-hidden="true"
-      >
-      </div>
-      <div
-        class="nav-right fixed md:static top-0 -right-full md:right-auto h-screen md:h-auto w-[78%] max-w-[360px] md:w-auto md:max-w-none z-50 md:z-auto bg-white dark:bg-gray-900 md:bg-transparent flex flex-col md:flex-row items-start md:items-center gap-6 pt-24 md:pt-0 px-8 md:px-0 transition-[right] duration-300 shadow-2xl md:shadow-none rounded-l-2xl md:rounded-none"
-        id="nav-menu"
-      >
-        <ul class="flex flex-col md:flex-row gap-6 md:gap-8 w-full md:w-auto">
-          <li>
-            <a
-              href={`${base}#about`}
-              class="text-gray-900 dark:text-gray-50 hover:text-primary font-medium transition-colors block text-lg md:text-base"
-              >About</a
-            >
-          </li>
-          <li>
-            <a
-              href={`${base}#projects`}
-              class="text-gray-900 dark:text-gray-50 hover:text-primary font-medium transition-colors block text-lg md:text-base"
-              >Projects</a
-            >
-          </li>
-          <li>
-            <a
-              href={`${base}#experience`}
-              class="text-gray-900 dark:text-gray-50 hover:text-primary font-medium transition-colors block text-lg md:text-base"
-              >Experience</a
-            >
-          </li>
-          <li>
-            <a
-              href={`${base}#contact`}
-              class="text-gray-900 dark:text-gray-50 hover:text-primary font-medium transition-colors block text-lg md:text-base"
-              >Contact</a
-            >
-          </li>
-        </ul>
-        <div class="flex items-center gap-3">
-          <button
-            id="theme-toggle"
-            class="mt-auto md:mt-0 w-10 h-10 border-2 border-gray-200 dark:border-gray-700 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-primary transition-all shadow-sm"
-            aria-label="Toggle dark mode"
-          >
-            <Icon name="heroicons:sun-20-solid" class="sun-icon hidden dark:block w-5 h-5" />
-            <Icon name="heroicons:moon-20-solid" class="moon-icon block dark:hidden w-5 h-5" />
-          </button>
-        </div>
-      </div>
+<header class="sticky top-0 z-[1000] border-b border-line/70 bg-canvas/95 transition-colors">
+  <!-- No backdrop-filter here: it would become the containing block for the
+       fixed-position mobile drawer and backdrop below. -->
+  <nav class="container flex h-16 items-center gap-2 md:h-20 md:gap-6" aria-label="Primary">
+    <a href={base} class="mr-auto flex items-center gap-3 text-ink no-underline">
+      <svg viewBox="0 0 32 32" class="h-8 w-8 flex-shrink-0" aria-hidden="true" focusable="false">
+        <rect width="32" height="32" rx="9" fill="#0c4a34"></rect>
+        <path d="M9 8.5 24.5 16 9 23.5Z" fill="#f4c430" stroke="#ecf5ef" stroke-width="1.5"></path>
+      </svg>
+      <span class="font-display text-lg tracking-tight">Chris Tulsi</span>
+    </a>
+    <!-- Mobile drawer backdrop: dims the page and closes the menu on click. -->
+    <div
+      id="nav-backdrop"
+      class="pointer-events-none fixed inset-0 z-40 bg-black/50 opacity-0 transition-opacity duration-300 md:hidden"
+      aria-hidden="true"
+    >
     </div>
+    <div
+      class="nav-right invisible fixed -right-full top-0 z-50 flex h-screen w-[80%] max-w-[360px] flex-col items-start gap-8 rounded-l-tile bg-surface px-8 pt-24 shadow-2xl transition-[right,visibility] duration-300 md:visible md:static md:right-auto md:z-auto md:h-auto md:w-auto md:max-w-none md:flex-row md:items-center md:gap-6 md:rounded-none md:bg-transparent md:px-0 md:pt-0 md:shadow-none"
+      id="nav-menu"
+    >
+      <ul class="flex w-full flex-col gap-5 md:w-auto md:flex-row md:items-center md:gap-1">
+        {
+          links.map((link) => (
+            <li>
+              <a
+                href={`${base}#${link.id}`}
+                class:list={[
+                  'block font-display text-3xl text-ink no-underline md:text-[0.95rem] md:font-semibold md:tracking-normal md:[font-stretch:100%]',
+                  link.id === 'contact'
+                    ? 'md:ml-2 md:rounded-full md:bg-gold md:px-5 md:py-2.5 md:text-on-gold md:hover:bg-gold/85'
+                    : 'hover:text-link md:rounded-full md:px-4 md:py-2.5 md:hover:bg-sunken md:hover:text-ink',
+                ]}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <button
+      id="theme-toggle"
+      class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border border-line text-ink transition-colors hover:bg-sunken"
+      aria-label="Toggle dark mode"
+    >
+      <Icon name="heroicons:sun-20-solid" class="sun-icon hidden h-5 w-5 dark:block" />
+      <Icon name="heroicons:moon-20-solid" class="moon-icon block h-5 w-5 dark:hidden" />
+    </button>
+    <button
+      id="mobile-menu-toggle"
+      class="mobile-menu-toggle z-[1001] flex h-11 w-11 flex-col items-center justify-center gap-1.5 rounded-full border border-line md:hidden"
+      aria-label="Toggle menu"
+      aria-expanded="false"
+      aria-controls="nav-menu"
+    >
+      <span class="h-0.5 w-5 rounded bg-ink transition-all duration-300"></span>
+      <span class="h-0.5 w-5 rounded bg-ink transition-all duration-300"></span>
+      <span class="h-0.5 w-5 rounded bg-ink transition-all duration-300"></span>
+    </button>
   </nav>
 </header>
 
@@ -103,6 +90,8 @@ const base = import.meta.env.BASE_URL ?? '/';
     spans[2]?.classList.toggle('!-rotate-45', open);
     spans[2]?.classList.toggle('!-translate-y-1.5', open);
     menu?.classList.toggle('!right-0', open);
+    // Closed drawer is visibility:hidden so its off-screen links leave the tab order.
+    menu?.classList.toggle('!visible', open);
     const backdrop = document.getElementById('nav-backdrop');
     backdrop?.classList.toggle('!opacity-100', open);
     backdrop?.classList.toggle('!pointer-events-auto', open);

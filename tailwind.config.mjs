@@ -1,64 +1,50 @@
 /** @type {import('tailwindcss').Config} */
+
+// Colors are CSS variables (RGB channels) defined per theme in Layout.astro, so
+// one utility like `bg-surface` works in both light and dark mode and still
+// supports opacity modifiers (`bg-surface/80`).
+const token = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+
 export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
   darkMode: ['class', '[data-theme="dark"]'],
+  // `.container` is defined in Layout.astro; Tailwind's own container utility
+  // would override its max-width from the later utilities layer.
+  corePlugins: {
+    container: false,
+  },
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'Noto Sans', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'],
+        sans: [
+          'Archivo',
+          'ui-sans-serif',
+          'system-ui',
+          '-apple-system',
+          'Segoe UI',
+          'Roboto',
+          'Helvetica',
+          'Arial',
+          'sans-serif',
+        ],
       },
       colors: {
-        primary: {
-          DEFAULT: '#3b82f6',
-          dark: '#2563eb',
-          light: '#60a5fa',
-        },
-        secondary: {
-          DEFAULT: '#8b5cf6',
-          light: '#a78bfa',
-        },
+        canvas: token('canvas'),
+        surface: token('surface'),
+        sunken: token('sunken'),
+        ink: token('ink'),
+        muted: token('muted'),
+        line: token('line'),
+        link: token('link'),
+        gold: token('gold'),
+        'on-gold': token('on-gold'),
+        forest: token('forest'),
+        'on-forest': token('on-forest'),
       },
-      animation: {
-        'float': 'float 3s ease-in-out infinite',
-        'shimmer': 'shimmer 2s ease-in-out infinite',
-        'wave': 'wave 10s ease-in-out infinite',
-        'ripple': 'ripple 0.6s ease-out',
-        'shake': 'shake 0.4s ease-in-out',
-        'slide-in-right': 'slideInRight 0.4s ease-out',
-        'fade-in-up': 'fadeInUp 0.6s ease-out both',
-      },
-      keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-20px)' },
-        },
-        shimmer: {
-          '0%': { backgroundPosition: '-200% center' },
-          '100%': { backgroundPosition: '200% center' },
-        },
-        wave: {
-          '0%, 100%': { transform: 'translateX(0)' },
-          '50%': { transform: 'translateX(10px)' },
-        },
-        ripple: {
-          '0%': { transform: 'scale(0)', opacity: '0.5' },
-          '100%': { transform: 'scale(4)', opacity: '0' },
-        },
-        shake: {
-          '0%, 100%': { transform: 'translateX(0)' },
-          '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-5px)' },
-          '20%, 40%, 60%, 80%': { transform: 'translateX(5px)' },
-        },
-        slideInRight: {
-          '0%': { transform: 'translateX(100%)', opacity: '0' },
-          '100%': { transform: 'translateX(0)', opacity: '1' },
-        },
-        fadeInUp: {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
+      borderRadius: {
+        tile: '1.75rem',
       },
     },
   },
   plugins: [],
-}
+};

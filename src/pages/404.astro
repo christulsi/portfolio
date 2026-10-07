@@ -9,105 +9,48 @@ const base = import.meta.env.BASE_URL;
 
 <Layout title="404 - Page Not Found | Chris Tulsi">
   <Header />
-  <main id="main">
-    <section class="min-h-[80vh] flex items-center bg-transparent py-24 relative overflow-hidden">
-      <div class="container relative z-10">
-        <div class="max-w-2xl mx-auto text-center fade-in">
-          <!-- 404 Number with gradient -->
-          <h1
-            class="text-9xl sm:text-[12rem] font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent leading-none"
-          >
-            404
-          </h1>
-
-          <!-- Error Message -->
-          <h2 class="text-3xl sm:text-4xl font-bold mb-4">Page Not Found</h2>
-
-          <p class="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-            Oops! The page you're looking for doesn't exist. It might have been moved or deleted.
-          </p>
-
-          <!-- Helpful Navigation -->
-          <div
-            class="bg-white/80 dark:bg-gray-900/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-8 mb-8"
-          >
-            <h3 class="text-xl font-semibold mb-4">Here's what you can do:</h3>
-            <ul class="text-left space-y-3">
-              <li class="flex items-start gap-3">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  class="text-primary flex-shrink-0 mt-0.5"
-                >
-                  <polyline points="9 11 12 14 22 4"></polyline>
-                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                </svg>
-                <span class="text-gray-600 dark:text-gray-300">Check the URL for typos</span>
-              </li>
-              <li class="flex items-start gap-3">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  class="text-primary flex-shrink-0 mt-0.5"
-                >
-                  <polyline points="9 11 12 14 22 4"></polyline>
-                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                </svg>
-                <span class="text-gray-600 dark:text-gray-300"
-                  >Return to the homepage and start fresh</span
-                >
-              </li>
-              <li class="flex items-start gap-3">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  class="text-primary flex-shrink-0 mt-0.5"
-                >
-                  <polyline points="9 11 12 14 22 4"></polyline>
-                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                </svg>
-                <span class="text-gray-600 dark:text-gray-300"
-                  >Browse my projects or get in touch</span
-                >
-              </li>
-            </ul>
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href={base} class="btn-primary">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                class="inline mr-2"
-              >
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                <polyline points="9 22 9 12 15 12 15 22"></polyline>
-              </svg>
-              Go Home
-            </a>
-            <a href={`${base}#projects`} class="btn-outline"> View Projects </a>
-            <a href={`${base}#contact`} class="btn-outline"> Contact Me </a>
-          </div>
+  <main id="main" class="container py-10 md:py-16">
+    <div class="grid gap-3 md:gap-4 lg:grid-cols-12">
+      <div class="rise tile tile-surface lg:col-span-8 md:p-12" style="--i: 0">
+        <h1 class="font-display text-[clamp(6rem,22vw,13rem)] leading-[0.85] tracking-tight">
+          404
+        </h1>
+        <p class="mt-8 text-2xl font-semibold">This page doesn't exist.</p>
+        <p class="mt-2 max-w-md text-lg text-muted">
+          The link may be mistyped, or the page may have moved. Everything on this site lives on the
+          home page.
+        </p>
+        <div class="mt-10 flex flex-col gap-3 sm:flex-row">
+          <a href={base} class="btn btn-gold">Go to the home page</a>
+          <a href={`${base}#contact`} class="btn btn-ghost">Get in touch</a>
         </div>
       </div>
-    </section>
+      <nav
+        class="rise tile tile-forest flex flex-col justify-end lg:col-span-4"
+        style="--i: 1"
+        aria-label="Site sections"
+      >
+        <p class="mb-4 text-sm text-on-forest/80">Or jump to a section</p>
+        <ul class="divide-y divide-on-forest/20 border-y border-on-forest/20">
+          {
+            [
+              { id: 'projects', label: 'Selected work' },
+              { id: 'about', label: 'About' },
+              { id: 'experience', label: 'Experience' },
+            ].map((link) => (
+              <li>
+                <a
+                  href={`${base}#${link.id}`}
+                  class="block py-4 text-xl font-semibold text-on-forest no-underline hover:underline"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
   </main>
   <Footer />
 </Layout>

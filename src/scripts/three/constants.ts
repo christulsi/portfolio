@@ -61,16 +61,16 @@ export const CAMERA_POSITION_Z = 70;
 // Renderer Settings — fixed full-viewport canvas, so keep DPR modest
 export const MAX_PIXEL_RATIO = 1.75;
 
-// Theme-aware Color Schemes. Light values are a touch stronger so the network
-// stays visible over the pale light-mode background gradient.
+// Theme-aware Color Schemes, matched to the site palette (forest green and
+// gold). Light values are deeper so the network stays visible on the pale canvas.
 export const COLOR_SCHEMES = {
   light: {
-    a: new THREE.Color(0x2563eb), // blue-600
-    b: new THREE.Color(0x7c3aed), // violet-600
+    a: new THREE.Color(0x0a6b47), // forest
+    b: new THREE.Color(0x2f9e74), // leaf
   },
   dark: {
-    a: new THREE.Color(0x22d3ee), // cyan-400
-    b: new THREE.Color(0x818cf8), // indigo-400
+    a: new THREE.Color(0xf4c430), // gold
+    b: new THREE.Color(0x4fd1a1), // mint
   },
 } as const;
 
