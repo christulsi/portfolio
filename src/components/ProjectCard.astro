@@ -50,25 +50,21 @@ const onForest = variant === 'forest';
   </div>
 
   <ul class="flex flex-wrap gap-2" aria-label={`Technologies used in ${title}`}>
-    {
-      technologies.map((tech) => (
-        <li class:list={['chip', onForest ? 'border-on-forest/30' : 'border-line bg-surface']}>
-          {tech}
-        </li>
-      ))
-    }
+    {technologies.map((tech) => (
+      <li class:list={['chip', onForest ? 'border-on-forest/30' : 'border-line bg-surface']}>
+        {tech}
+      </li>
+    ))}
   </ul>
 
-  {
-    githubUrl && (
-      <a
-        href={githubUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        class:list={['font-semibold underline', onForest && 'text-on-forest']}
-      >
-        View source on GitHub
-      </a>
-    )
-  }
+  {githubUrl && (
+    <a
+      href={githubUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class:list={['font-semibold underline', onForest && 'text-on-forest']}
+    >
+      View source on GitHub
+    </a>
+  )}
 </article>

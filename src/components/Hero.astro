@@ -22,9 +22,7 @@ const figures = [
       class="rise tile tile-surface flex flex-col justify-between gap-8 md:col-span-2 md:p-10 lg:col-span-8 lg:row-span-2"
       style="--i: 0"
     >
-      <p
-        class="inline-flex w-fit items-center gap-2 rounded-full bg-sunken px-3.5 py-1.5 text-sm font-medium"
-      >
+      <p class="inline-flex w-fit items-center gap-2 rounded-full bg-sunken px-3.5 py-1.5 text-sm font-medium">
         <span class="h-2 w-2 rounded-full bg-[#1f8a5b]" aria-hidden="true"></span>
         Open to new opportunities
       </p>
@@ -39,25 +37,27 @@ const figures = [
         </p>
       </div>
       <div class="flex flex-col gap-3 sm:flex-row">
-        <a href={`${base}#projects`} class="btn btn-gold">See selected work</a>
-        <a href={`${base}#contact`} class="btn btn-ghost">Get in touch</a>
+        <a href={`${base}#projects`} class="btn btn-gold">
+          See selected work
+        </a>
+        <a href={`${base}#contact`} class="btn btn-ghost">
+          Get in touch
+        </a>
       </div>
     </div>
 
-    {
-      current && (
-        <div
-          class="rise tile tile-gold flex flex-col justify-between gap-8 lg:col-span-4"
-          style="--i: 1"
-        >
-          <p class="text-sm font-medium">Since {periodStart(current.period)}</p>
-          <p class="text-2xl font-semibold leading-snug md:text-[1.7rem]">
-            {current.title}
-            <span class="block font-normal">{current.company}</span>
-          </p>
-        </div>
-      )
-    }
+    {current && (
+      <div
+        class="rise tile tile-gold flex flex-col justify-between gap-8 lg:col-span-4"
+        style="--i: 1"
+      >
+        <p class="text-sm font-medium">Since {periodStart(current.period)}</p>
+        <p class="text-2xl font-semibold leading-snug md:text-[1.7rem]">
+          {current.title}
+          <span class="block font-normal">{current.company}</span>
+        </p>
+      </div>
+    )}
 
     <div
       class="rise tile tile-forest flex flex-col justify-between gap-8 lg:col-span-4"
@@ -65,7 +65,9 @@ const figures = [
     >
       <p class="text-sm font-medium text-on-forest/80">Local time in Guyana</p>
       <p class="font-heading text-5xl tabular-nums md:text-6xl">
-        <time id="gy-clock" data-tz="America/Guyana">GMT−4</time>
+        <time id="gy-clock" data-tz="America/Guyana">
+          GMT−4
+        </time>
       </p>
     </div>
 
@@ -73,14 +75,12 @@ const figures = [
       class="rise tile tile-sunken grid grid-cols-2 gap-x-6 gap-y-6 md:col-span-2 md:grid-cols-4 md:py-7 lg:col-span-12"
       style="--i: 3"
     >
-      {
-        figures.map((figure) => (
-          <div class="flex flex-col-reverse gap-1 md:border-l md:border-line md:pl-6 md:first:border-l-0 md:first:pl-0">
-            <dt class="text-sm text-muted">{figure.label}</dt>
-            <dd class="font-heading text-3xl md:text-4xl">{figure.value}</dd>
-          </div>
-        ))
-      }
+      {figures.map((figure) => (
+        <div class="flex flex-col-reverse gap-1 md:border-l md:border-line md:pl-6 md:first:border-l-0 md:first:pl-0">
+          <dt class="text-sm text-muted">{figure.label}</dt>
+          <dd class="font-heading text-3xl md:text-4xl">{figure.value}</dd>
+        </div>
+      ))}
     </dl>
   </div>
 </section>

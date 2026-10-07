@@ -30,37 +30,39 @@ const channels = [
   <div class="tile tile-forest grid gap-10 p-6 md:p-10 lg:grid-cols-12 lg:gap-12 lg:p-14">
     <div class="flex flex-col gap-8 lg:col-span-5">
       <div>
-        <h2 id="contact-title" class="section-title">Get in touch</h2>
+        <h2 id="contact-title" class="section-title">
+          Get in touch
+        </h2>
         <p class="mt-5 max-w-md text-lg text-on-forest/85">
           I'm open to new roles, public-sector consulting and collaborations. Email is the fastest
           way to reach me; the form sends to the same inbox.
         </p>
       </div>
       <ul class="mt-auto divide-y divide-on-forest/20 border-y border-on-forest/20">
-        {
-          channels.map((channel) => (
-            <li>
-              <a
-                href={channel.href}
-                {...(channel.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                class="group flex items-center gap-4 py-4 text-on-forest no-underline"
-              >
-                <Icon name={channel.icon} class="h-5 w-5 flex-shrink-0 text-gold" />
-                <span class="flex flex-col">
-                  <span class="text-sm text-on-forest/80">{channel.label}</span>
-                  <span class="font-semibold group-hover:underline">{channel.value}</span>
-                </span>
-              </a>
-            </li>
-          ))
-        }
+        {channels.map((channel) => (
+          <li>
+            <a
+              href={channel.href}
+              {...(channel.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              class="group flex items-center gap-4 py-4 text-on-forest no-underline"
+            >
+              <Icon name={channel.icon} class="h-5 w-5 flex-shrink-0 text-gold" />
+              <span class="flex flex-col">
+                <span class="text-sm text-on-forest/80">{channel.label}</span>
+                <span class="font-semibold group-hover:underline">{channel.value}</span>
+              </span>
+            </a>
+          </li>
+        ))}
       </ul>
     </div>
 
     <form id="contact-form" class="rounded-[1.25rem] bg-surface p-6 text-ink md:p-8 lg:col-span-7">
       <div class="grid gap-5 md:grid-cols-2">
         <div class="relative">
-          <label for="name" class="mb-2 block font-semibold">Name</label>
+          <label for="name" class="mb-2 block font-semibold">
+            Name
+          </label>
           <input
             type="text"
             id="name"
@@ -76,7 +78,9 @@ const channels = [
           </p>
         </div>
         <div class="relative">
-          <label for="email" class="mb-2 block font-semibold">Email</label>
+          <label for="email" class="mb-2 block font-semibold">
+            Email
+          </label>
           <input
             type="email"
             id="email"
@@ -92,7 +96,9 @@ const channels = [
         </div>
       </div>
       <div class="mt-5">
-        <label for="message" class="mb-2 block font-semibold">Message</label>
+        <label for="message" class="mb-2 block font-semibold">
+          Message
+        </label>
         <textarea
           id="message"
           name="message"
@@ -106,7 +112,9 @@ const channels = [
           <p class="hidden text-red-700 dark:text-red-300" id="message-error">
             Message must be at least 10 characters
           </p>
-          <p class="ml-auto text-muted"><span id="char-count">0</span>/500</p>
+          <p class="ml-auto text-muted">
+            <span id="char-count">0</span>/500
+          </p>
         </div>
       </div>
       <button
@@ -115,7 +123,9 @@ const channels = [
         class="btn btn-gold mt-6 w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
       >
         <span id="submit-text">Send message</span>
-        <span id="submit-loading" class="hidden">Sending…</span>
+        <span id="submit-loading" class="hidden">
+          Sending…
+        </span>
       </button>
     </form>
   </div>

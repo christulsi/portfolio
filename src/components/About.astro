@@ -7,7 +7,9 @@ const categories = skillEntries.map((entry) => entry.data);
 
 <section id="about" class="section container" aria-labelledby="about-title">
   <div class="section-head">
-    <h2 id="about-title" class="section-title">About</h2>
+    <h2 id="about-title" class="section-title">
+      About
+    </h2>
     <p class="section-intro">
       Working inside government IT since 2019, from writing the apps to keeping them running.
     </p>
@@ -35,20 +37,18 @@ const categories = skillEntries.map((entry) => entry.data);
     <div class="tile tile-sunken lg:col-span-5">
       <h3 class="mb-2 text-xl font-semibold">Toolkit</h3>
       <dl>
-        {
-          categories.map((category) => (
-            <div class="border-b border-line py-5 last:border-b-0 last:pb-0">
-              <dt class="mb-3 text-sm font-medium text-muted">{category.name}</dt>
-              <dd>
-                <ul class="flex flex-wrap gap-2">
-                  {category.skills.map((skill) => (
-                    <li class="chip border-line bg-surface">{skill}</li>
-                  ))}
-                </ul>
-              </dd>
-            </div>
-          ))
-        }
+        {categories.map((category) => (
+          <div class="border-b border-line py-5 last:border-b-0 last:pb-0">
+            <dt class="mb-3 text-sm font-medium text-muted">{category.name}</dt>
+            <dd>
+              <ul class="flex flex-wrap gap-2">
+                {category.skills.map((skill) => (
+                  <li class="chip border-line bg-surface">{skill}</li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        ))}
       </dl>
     </div>
   </div>

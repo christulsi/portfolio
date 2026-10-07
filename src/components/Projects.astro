@@ -19,18 +19,18 @@ const layout = [
 
 <section id="projects" class="section container" aria-labelledby="projects-title">
   <div class="section-head">
-    <h2 id="projects-title" class="section-title">Selected work</h2>
+    <h2 id="projects-title" class="section-title">
+      Selected work
+    </h2>
     <p class="section-intro">
       Systems for government agencies in Guyana, and the tooling that keeps them shipping.
     </p>
   </div>
 
   <div class="grid gap-3 md:gap-4 lg:grid-cols-12">
-    {
-      projects.map((project, index) => {
-        const slot = layout[index % layout.length] ?? layout[1];
-        return <ProjectCard {...project} variant={slot.variant} class={slot.span} />;
-      })
-    }
+    {projects.map((project, index) => {
+      const slot = layout[index % layout.length] ?? layout[1];
+      return <ProjectCard {...project} variant={slot.variant} class={slot.span} />;
+    })}
   </div>
 </section>

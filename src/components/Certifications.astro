@@ -10,36 +10,36 @@ const certifications = sortByOrder(
 
 <section id="certifications" class="section container" aria-labelledby="certifications-title">
   <div class="section-head">
-    <h2 id="certifications-title" class="section-title">Education and certification</h2>
+    <h2 id="certifications-title" class="section-title">
+      Education and certification
+    </h2>
   </div>
 
   <ul class="border-t border-line">
-    {
-      certifications.map((cert) => (
-        <li class="grid gap-1 border-b border-line py-6 md:grid-cols-12 md:items-baseline md:gap-8">
-          <div class="md:col-span-7">
-            <h3 class="text-xl font-semibold leading-snug">{cert.name}</h3>
-            {cert.credentialId && cert.credentialId !== 'Your-Credential-ID' && (
-              <p class="mt-1 break-all text-sm text-muted">Credential ID {cert.credentialId}</p>
-            )}
-          </div>
-          <p class="text-muted md:col-span-3">{cert.issuer}</p>
-          <div class="text-sm text-muted md:col-span-2 md:text-right">
-            {cert.date !== 'Completed' && <p>{cert.date}</p>}
-            {cert.verifyUrl && cert.verifyUrl !== '#' && (
-              <a
-                href={cert.verifyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Verify ${cert.name}`}
-                class="font-semibold underline"
-              >
-                Verify credential
-              </a>
-            )}
-          </div>
-        </li>
-      ))
-    }
+    {certifications.map((cert) => (
+      <li class="grid gap-1 border-b border-line py-6 md:grid-cols-12 md:items-baseline md:gap-8">
+        <div class="md:col-span-7">
+          <h3 class="text-xl font-semibold leading-snug">{cert.name}</h3>
+          {cert.credentialId && cert.credentialId !== 'Your-Credential-ID' && (
+            <p class="mt-1 break-all text-sm text-muted">Credential ID {cert.credentialId}</p>
+          )}
+        </div>
+        <p class="text-muted md:col-span-3">{cert.issuer}</p>
+        <div class="text-sm text-muted md:col-span-2 md:text-right">
+          {cert.date !== 'Completed' && <p>{cert.date}</p>}
+          {cert.verifyUrl && cert.verifyUrl !== '#' && (
+            <a
+              href={cert.verifyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Verify ${cert.name}`}
+              class="font-semibold underline"
+            >
+              Verify credential
+            </a>
+          )}
+        </div>
+      </li>
+    ))}
   </ul>
 </section>

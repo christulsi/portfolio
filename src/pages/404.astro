@@ -21,8 +21,12 @@ const base = import.meta.env.BASE_URL;
           home page.
         </p>
         <div class="mt-10 flex flex-col gap-3 sm:flex-row">
-          <a href={base} class="btn btn-gold">Go to the home page</a>
-          <a href={`${base}#contact`} class="btn btn-ghost">Get in touch</a>
+          <a href={base} class="btn btn-gold">
+            Go to the home page
+          </a>
+          <a href={`${base}#contact`} class="btn btn-ghost">
+            Get in touch
+          </a>
         </div>
       </div>
       <nav
@@ -32,22 +36,20 @@ const base = import.meta.env.BASE_URL;
       >
         <p class="mb-4 text-sm text-on-forest/80">Or jump to a section</p>
         <ul class="divide-y divide-on-forest/20 border-y border-on-forest/20">
-          {
-            [
-              { id: 'projects', label: 'Selected work' },
-              { id: 'about', label: 'About' },
-              { id: 'experience', label: 'Experience' },
-            ].map((link) => (
-              <li>
-                <a
-                  href={`${base}#${link.id}`}
-                  class="block py-4 text-xl font-semibold text-on-forest no-underline hover:underline"
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))
-          }
+          {[
+            { id: 'projects', label: 'Selected work' },
+            { id: 'about', label: 'About' },
+            { id: 'experience', label: 'Experience' },
+          ].map((link) => (
+            <li>
+              <a
+                href={`${base}#${link.id}`}
+                class="block py-4 text-xl font-semibold text-on-forest no-underline hover:underline"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
         </ul>
       </nav>
     </div>

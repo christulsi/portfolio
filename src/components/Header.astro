@@ -27,30 +27,27 @@ const links = [
       id="nav-backdrop"
       class="pointer-events-none fixed inset-0 z-40 bg-black/50 opacity-0 transition-opacity duration-300 md:hidden"
       aria-hidden="true"
-    >
-    </div>
+    ></div>
     <div
       class="nav-right invisible fixed -right-full top-0 z-50 flex h-screen w-[80%] max-w-[360px] flex-col items-start gap-8 rounded-l-tile bg-surface px-8 pt-24 shadow-2xl transition-[right,visibility] duration-300 md:visible md:static md:right-auto md:z-auto md:h-auto md:w-auto md:max-w-none md:flex-row md:items-center md:gap-6 md:rounded-none md:bg-transparent md:px-0 md:pt-0 md:shadow-none"
       id="nav-menu"
     >
       <ul class="flex w-full flex-col gap-5 md:w-auto md:flex-row md:items-center md:gap-1">
-        {
-          links.map((link) => (
-            <li>
-              <a
-                href={`${base}#${link.id}`}
-                class:list={[
-                  'block font-heading text-3xl text-ink no-underline md:text-[0.95rem] md:font-semibold md:tracking-normal md:[font-stretch:100%]',
-                  link.id === 'contact'
-                    ? 'md:ml-2 md:rounded-full md:bg-gold md:px-5 md:py-2.5 md:text-on-gold md:hover:bg-gold/85'
-                    : 'hover:text-link md:rounded-full md:px-4 md:py-2.5 md:hover:bg-sunken md:hover:text-ink',
-                ]}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))
-        }
+        {links.map((link) => (
+          <li>
+            <a
+              href={`${base}#${link.id}`}
+              class:list={[
+                'block font-heading text-3xl text-ink no-underline md:text-[0.95rem] md:font-semibold md:tracking-normal md:[font-stretch:100%]',
+                link.id === 'contact'
+                  ? 'md:ml-2 md:rounded-full md:bg-gold md:px-5 md:py-2.5 md:text-on-gold md:hover:bg-gold/85'
+                  : 'hover:text-link md:rounded-full md:px-4 md:py-2.5 md:hover:bg-sunken md:hover:text-ink',
+              ]}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
       </ul>
     </div>
     <button
