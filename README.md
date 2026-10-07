@@ -28,16 +28,20 @@ A modern, responsive portfolio website built with [Astro](https://astro.build) -
 
 ### Sections
 
-- **Hero** - 3D particle background with interactive morphing geometry
-- **About** - Biography with animated skills showcase
-- **Stats** - Key metrics and achievements display
-- **Projects** - Featured work with technology tags, live demos, and GitHub links
-- **Experience** - Professional timeline with role achievements
-- **Certifications** - Professional credentials and courses
-- **Testimonials** - Client and colleague recommendations
+- **Hero** - Bento grid: oversized name, current role (from the experiences collection), live local time in Guyana, and key figures
+- **Projects** - Bento grid of featured work, ordered by `order`, with client and headline outcome
+- **About** - Biography and toolkit grouped by category
+- **Experience** - Reverse-chronological timeline with role achievements
+- **Certifications** - Education and professional credentials
+- **Testimonials** - Colleague and client recommendations
 - **Contact** - Validated form with real-time feedback and toast notifications
 - **Footer** - Social links and attribution
-- **Scroll-to-top** - Animated button for quick navigation
+- **Scroll-to-top** - Button for quick navigation
+- **Background** - Site-wide three.js constellation, recolored per theme
+
+### Design system
+
+Tokens live in one place: CSS variables in [src/layouts/Layout.astro](src/layouts/Layout.astro), exposed to Tailwind as `canvas`, `surface`, `sunken`, `ink`, `muted`, `line`, `link`, `gold` and `forest` (see [tailwind.config.mjs](tailwind.config.mjs)), so one class works in light and dark mode. The palette takes the forest green and gold of Guyana's Golden Arrowhead. Type is Archivo throughout; `.font-display` stretches it to its widest cut for headings. Tiles (`.tile` plus `.tile-surface`, `.tile-sunken`, `.tile-forest` or `.tile-gold`) build the bento layouts. Run `npm run generate:images` after brand changes to re-render the OG image and PNG icons.
 
 ## 📁 Project Structure
 
@@ -60,7 +64,6 @@ portfolio-site/
 │   │   ├── Header.astro
 │   │   ├── Hero.astro
 │   │   ├── About.astro
-│   │   ├── Stats.astro
 │   │   ├── Projects.astro
 │   │   ├── ProjectCard.astro
 │   │   ├── Experience.astro
@@ -69,7 +72,6 @@ portfolio-site/
 │   │   ├── Contact.astro
 │   │   ├── Footer.astro
 │   │   ├── ScrollToTop.astro
-│   │   ├── SectionDivider.astro
 │   │   └── Toast.astro
 │   ├── content/                # Astro content collections (typed JSON)
 │   │   ├── config.ts           # Collection schemas (Zod)
@@ -157,36 +159,30 @@ npm run dev
 ### Personal Information
 
 1. **Hero Section** - Edit [src/components/Hero.astro](src/components/Hero.astro):
-   - Change your name and tagline
-   - Update the description text
-   - Customize call-to-action buttons
+   - Change the tagline, call-to-action buttons and the key figures (`figures`)
+   - The "since" tile reads the current role from the experiences collection
 
-2. **About Section** - Edit [src/components/About.astro](src/components/About.astro) and [src/data/skills.json](src/data/skills.json):
+2. **About Section** - Edit [src/components/About.astro](src/components/About.astro) and `src/content/skills/*.json`:
    - Update biography text
-   - Add/modify skills in `skills.json`
+   - Add/modify skill categories in the JSON files
 
-3. **Stats** - Edit [src/components/Stats.astro](src/components/Stats.astro):
-   - Update metrics (years of experience, projects completed, etc.)
+3. **Projects** - Edit `src/content/projects/*.json`:
+   - Titles, descriptions, technologies and links; optional `client`, `outcome` (shown as a gold pill) and `order` (display position)
 
-4. **Projects** - Edit [src/data/projects.json](src/data/projects.json):
-   - Add your projects with titles, descriptions, technologies, images, and links
-   - Projects are automatically rendered from this JSON file
+4. **Experience** - Edit `src/content/experiences/*.json`:
+   - Job titles, companies, periods and achievements; set `order` so the newest role comes first
 
-5. **Experience** - Edit [src/data/experiences.json](src/data/experiences.json):
-   - Add your work history with job titles, companies, periods, and achievements
-   - Timeline is auto-generated from the JSON data
+5. **Certifications** - Edit `src/content/certifications/*.json`:
+   - Professional certifications and degrees; `order` controls position (the first gets the gold tile)
 
-6. **Certifications** - Edit [src/data/certifications.json](src/data/certifications.json):
-   - Add your professional certifications and credentials
+6. **Testimonials** - Edit `src/content/testimonials/*.json`:
+   - Recommendations with names and roles
 
-7. **Testimonials** - Edit [src/data/testimonials.json](src/data/testimonials.json):
-   - Add client/colleague recommendations with names, roles, and companies
-
-8. **Contact & Footer** - Edit [src/components/Contact.astro](src/components/Contact.astro) and [src/components/Footer.astro](src/components/Footer.astro):
+7. **Contact & Footer** - Edit [src/components/Contact.astro](src/components/Contact.astro) and [src/components/Footer.astro](src/components/Footer.astro):
    - Update email addresses
    - Add your GitHub, LinkedIn, Twitter, and other social media links
 
-9. **Site Metadata** - Edit [astro.config.mjs](astro.config.mjs):
+8. **Site Metadata** - Edit [astro.config.mjs](astro.config.mjs):
    - Update the `site` field with your actual domain
    - Update the `base` path for your deployment
 
