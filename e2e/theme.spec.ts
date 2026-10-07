@@ -84,6 +84,9 @@ test.describe('Theme Toggle', () => {
   });
 
   test('should update Three.js colors when theme changes', async ({ page }) => {
+    // Layout.astro never loads the constellation below 640px wide.
+    test.skip((page.viewportSize()?.width ?? 0) < 640, 'Three.js is not loaded on small screens');
+
     const themeToggle = page
       .locator(
         'button[aria-label*="dark mode" i], button[aria-label*="theme" i], button:has-text("Dark"), button:has-text("Light")'

@@ -25,9 +25,33 @@ test.describe('Mobile Navigation', () => {
     await menuBtn.click();
     await page.waitForTimeout(300);
 
-    // Mobile navigation should be visible
-    const mobileNav = page.locator('nav[class*="mobile"], [class*="mobile-menu"], aside');
-    await expect(mobileNav.first()).toBeVisible();
+    // The drawer should be open, announced as expanded, and its links on screen
+    await expect(menuBtn).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('#nav-menu')).toBeVisible();
+    await expect(page.locator('#nav-menu a[href*="#about"]')).toBeInViewport();
+  });
+
+  test('should keep the closed drawer out of the tab order', async ({ page }) => {
+    // Off-screen links must not be focusable while the drawer is closed.
+    await expect(page.locator('#nav-menu')).toBeHidden();
+    for (let i = 0; i < 6; i++) {
+      await page.keyboard.press('Tab');
+      const inDrawer = await page.evaluate(
+        () => document.activeElement?.closest('#nav-menu') !== null
+      );
+      expect(inDrawer).toBe(false);
+    }
+  });
+
+  test('should keep the theme toggle reachable without opening the menu', async ({ page }) => {
+    await expect(page.locator('#theme-toggle')).toBeInViewport();
+  });
+
+  test('should not scroll horizontally', async ({ page }) => {
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
   });
 
   test('should close mobile menu when clicking a link', async ({ page }) => {
@@ -43,6 +67,9 @@ test.describe('Mobile Navigation', () => {
     // Click a navigation link
     await page.click('nav a[href*="#about"]');
     await page.waitForTimeout(500);
+
+    // The drawer should close
+    await expect(menuBtn).toHaveAttribute('aria-expanded', 'false');
 
     // Menu should close (or we should navigate away)
     // For SPAs, check if menu closed. For multi-page, check URL

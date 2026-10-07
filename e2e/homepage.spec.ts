@@ -1,30 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-/**
- * Helper function to click a navigation link, handling mobile menu if needed
- */
-async function clickNavLink(page: any, linkSelector: string) {
-  const viewport = page.viewportSize();
-  const isMobile = viewport && viewport.width < 768;
-
-  if (isMobile) {
-    // On mobile, open the hamburger menu first
-    const menuToggle = page.locator('#mobile-menu-toggle');
-    await menuToggle.click();
-
-    // Wait for menu animation
-    await page.waitForTimeout(400);
-
-    // Click the link
-    await page.locator(linkSelector).click();
-
-    // Wait for menu close animation
-    await page.waitForTimeout(400);
-  } else {
-    // On desktop, click the link directly
-    await page.locator(linkSelector).click();
-  }
-}
+import { clickNavLink, openNavIfCollapsed } from './helpers';
 
 test.describe('Homepage', () => {
   test.beforeEach(async ({ page }) => {
@@ -49,6 +25,9 @@ test.describe('Homepage', () => {
     // Wait for header to be visible
     const header = page.locator('header');
     await expect(header).toBeVisible();
+
+    // On mobile the links live in the drawer, which is hidden until opened.
+    await openNavIfCollapsed(page);
 
     // Check navigation links exist - links include base path
     await expect(page.locator('nav a[href*="#about"]')).toBeVisible();
@@ -124,5 +103,22 @@ test.describe('Homepage', () => {
 
     await expect(githubLink.first()).toBeVisible();
     await expect(linkedinLink.first()).toBeVisible();
+  });
+
+  test('should list experience with the current role first', async ({ page }) => {
+    const roles = page.locator('#experience h3');
+    await expect(roles.first()).toHaveText('Senior ICT Engineer');
+    await expect(page.locator('#experience li').first()).toContainText('Present');
+  });
+
+  test('should show live local time in Guyana', async ({ page }) => {
+    // Static HTML shows the UTC offset; the script replaces it with HH:MM.
+    await expect(page.locator('#gy-clock')).toHaveText(/^\d{2}:\d{2}$/);
+  });
+
+  test('should lead the projects grid with the Single Window platform', async ({ page }) => {
+    const firstProject = page.locator('#projects article').first();
+    await expect(firstProject.locator('h3')).toHaveText('Single Window Application Platform');
+    await expect(firstProject).toContainText('40% faster processing');
   });
 });
