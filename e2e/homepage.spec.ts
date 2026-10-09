@@ -49,18 +49,11 @@ test.describe('Homepage', () => {
   });
 
   test('should display Three.js canvas', async ({ page }) => {
-    // Check if Three.js root element exists
     const threeRoot = page.locator('#three-root');
     await expect(threeRoot).toBeVisible();
 
-    // Check if canvas was added - skip on mobile as Three.js may not render
-    const viewport = page.viewportSize();
-    const isMobile = viewport && viewport.width < 768;
-
-    if (!isMobile) {
-      const canvas = threeRoot.locator('canvas');
-      await expect(canvas).toBeVisible({ timeout: 5000 });
-    }
+    // Every viewport gets a scene now; phones load a lighter one once idle.
+    await expect(threeRoot.locator('canvas')).toBeVisible({ timeout: 8000 });
   });
 
   test('should have a working scroll-to-top button', async ({ page }) => {

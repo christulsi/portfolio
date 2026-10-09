@@ -112,18 +112,20 @@ test.describe('Mobile Navigation', () => {
     await expect(page.locator('#contact')).toBeVisible();
   });
 
-  test('should not display Three.js on small screens if disabled', async ({ page }) => {
-    // Check if Three.js is loaded or disabled based on screen size
-    const threeRoot = page.locator('#three-root');
+  test('should load a lighter 3D scene on phones', async ({ page }) => {
+    const canvas = page.locator('#three-root canvas');
+    await expect(canvas).toBeVisible({ timeout: 8000 });
 
-    // Wait a bit for potential Three.js loading
-    await page.waitForTimeout(2000);
+    // Pixel ratio is capped at 1.5 on phone-sized viewports.
+    const { width, cssWidth } = await canvas.evaluate((el: HTMLCanvasElement) => ({
+      width: el.width,
+      cssWidth: el.clientWidth,
+    }));
+    expect(width).toBeLessThanOrEqual(Math.ceil(cssWidth * 1.5));
+  });
 
-    const canvas = threeRoot.locator('canvas');
-
-    // On small screens (< 640px), Three.js might be disabled
-    // If canvas exists, that's fine. If not, that's also expected behavior.
-    const canvasCount = await canvas.count();
-    expect(canvasCount).toBeGreaterThanOrEqual(0);
+  test('should not show the custom cursor on touch devices', async ({ page }) => {
+    await expect(page.locator('#cursor')).toBeHidden();
+    await expect(page.locator('html')).not.toHaveClass(/has-cursor/);
   });
 });

@@ -31,16 +31,28 @@ export async function clickNavLink(page: Page, linkSelector: string): Promise<vo
 }
 
 /**
- * Wait until every time-based CSS animation and transition has finished.
- * The hero tiles fade in on load; scanning mid-fade would measure text at
- * partial opacity and report false color-contrast failures. Scroll-driven
- * animations (the constellation dim) never "finish", so they are ignored.
+ * Wait until the page is visually settled: the GSAP intro (loader + hero
+ * entrance) has finished and every time-based CSS animation or transition is
+ * done. Scanning mid-fade would measure text at partial opacity and report
+ * false color-contrast failures. GSAP tweens don't show up in
+ * `document.getAnimations()`, so the intro signals completion with
+ * `html[data-intro="done"]` (set on every page, immediately when there is no
+ * intro). Scroll-driven animations never "finish", so they are ignored.
  */
 export async function settleAnimations(page: Page): Promise<void> {
-  await page.waitForFunction(() =>
-    document
-      .getAnimations()
-      .filter((animation) => animation.timeline === document.timeline)
-      .every((animation) => animation.playState !== 'running')
+  await page.waitForFunction(
+    () => {
+      const html = document.documentElement;
+      const introDone = !html.classList.contains('motion') || html.dataset.intro === 'done';
+      return (
+        introDone &&
+        document
+          .getAnimations()
+          .filter((animation) => animation.timeline === document.timeline)
+          .every((animation) => animation.playState !== 'running')
+      );
+    },
+    undefined,
+    { timeout: 10_000 }
   );
 }
