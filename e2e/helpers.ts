@@ -31,12 +31,16 @@ export async function clickNavLink(page: Page, linkSelector: string): Promise<vo
 }
 
 /**
- * Wait until every CSS animation and transition on the page has finished.
+ * Wait until every time-based CSS animation and transition has finished.
  * The hero tiles fade in on load; scanning mid-fade would measure text at
- * partial opacity and report false color-contrast failures.
+ * partial opacity and report false color-contrast failures. Scroll-driven
+ * animations (the constellation dim) never "finish", so they are ignored.
  */
 export async function settleAnimations(page: Page): Promise<void> {
   await page.waitForFunction(() =>
-    document.getAnimations().every((animation) => animation.playState !== 'running')
+    document
+      .getAnimations()
+      .filter((animation) => animation.timeline === document.timeline)
+      .every((animation) => animation.playState !== 'running')
   );
 }
