@@ -26,7 +26,7 @@ const channels = [
 ];
 ---
 
-<section id="contact" class="section container" aria-labelledby="contact-title">
+<section id="contact" class="section page-width" aria-labelledby="contact-title">
   <div
     class="tile tile-forest grid gap-10 p-6 md:p-10 lg:grid-cols-12 lg:gap-12 lg:p-14"
     data-reveal="fade"
@@ -49,7 +49,7 @@ const channels = [
               {...(channel.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               class="group flex items-center gap-4 py-4 text-on-forest no-underline"
             >
-              <Icon name={channel.icon} class="h-5 w-5 flex-shrink-0 text-gold" />
+              <Icon name={channel.icon} class="h-5 w-5 shrink-0 text-gold" />
               <span class="flex flex-col">
                 <span class="text-sm text-on-forest/80">{channel.label}</span>
                 <span class="font-semibold group-hover:underline">{channel.value}</span>
@@ -73,7 +73,7 @@ const channels = [
             autocomplete="name"
             required
             minlength="2"
-            class="w-full rounded-xl border border-line bg-canvas px-4 py-3 text-ink transition-colors focus:border-link focus:outline-none focus:ring-2 focus:ring-link/25 pr-11"
+            class="w-full rounded-xl border border-line bg-canvas px-4 py-3 text-ink transition-colors focus:border-link focus:outline-hidden focus:ring-2 focus:ring-link/25 pr-11"
           />
           <div class="field-icon hidden" id="name-icon"></div>
           <p class="mt-1 hidden text-sm text-red-700 dark:text-red-300" id="name-error">
@@ -90,7 +90,7 @@ const channels = [
             name="email"
             autocomplete="email"
             required
-            class="w-full rounded-xl border border-line bg-canvas px-4 py-3 text-ink transition-colors focus:border-link focus:outline-none focus:ring-2 focus:ring-link/25 pr-11"
+            class="w-full rounded-xl border border-line bg-canvas px-4 py-3 text-ink transition-colors focus:border-link focus:outline-hidden focus:ring-2 focus:ring-link/25 pr-11"
           />
           <div class="field-icon hidden" id="email-icon"></div>
           <p class="mt-1 hidden text-sm text-red-700 dark:text-red-300" id="email-error">
@@ -109,7 +109,7 @@ const channels = [
           required
           minlength="10"
           maxlength="500"
-          class="w-full rounded-xl border border-line bg-canvas px-4 py-3 text-ink transition-colors focus:border-link focus:outline-none focus:ring-2 focus:ring-link/25 resize-y"
+          class="w-full rounded-xl border border-line bg-canvas px-4 py-3 text-ink transition-colors focus:border-link focus:outline-hidden focus:ring-2 focus:ring-link/25 resize-y"
         ></textarea>
         <div class="mt-1 flex justify-between gap-4 text-sm">
           <p class="hidden text-red-700 dark:text-red-300" id="message-error">

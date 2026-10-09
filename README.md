@@ -54,7 +54,7 @@ With `prefers-reduced-motion: reduce`, none of this animates: no loader, native 
 
 ### Design system
 
-Tokens live in one place: CSS variables in [src/layouts/Layout.astro](src/layouts/Layout.astro), exposed to Tailwind as `canvas`, `surface`, `sunken`, `ink`, `muted`, `line`, `link`, `gold` and `forest` (see [tailwind.config.mjs](tailwind.config.mjs)), so one class works in light and dark mode. The palette takes the forest green and gold of Guyana's Golden Arrowhead. Type is Archivo throughout; `.font-display` stretches it to its widest cut for headings. Tiles (`.tile` plus `.tile-surface`, `.tile-sunken`, `.tile-forest` or `.tile-gold`) build the bento layouts. Run `npm run generate:images` after brand changes to re-render the OG image and PNG icons.
+Tokens live in one place: CSS variables in [src/styles/global.css](src/styles/global.css) (the Tailwind CSS v4 entry, which loads the JS config via `@config`), exposed to Tailwind as `canvas`, `surface`, `sunken`, `ink`, `muted`, `line`, `link`, `gold` and `forest` (see [tailwind.config.mjs](tailwind.config.mjs)), so one class works in light and dark mode. The palette takes the forest green and gold of Guyana's Golden Arrowhead. Type is Archivo throughout; `font-display` stretches it to its widest cut for the name and `font-heading` sets section headings. Sections use the `page-width` utility for the shared measure (not `container`, which Tailwind v4 reserves). Tiles (`.tile` plus `.tile-surface`, `.tile-sunken`, `.tile-forest` or `.tile-gold`) build the bento layouts. Run `npm run generate:images` after brand changes to re-render the OG image and PNG icons.
 
 ## 📁 Project Structure
 
@@ -95,6 +95,8 @@ portfolio-site/
 │   │   └── testimonials/*.json
 │   ├── layouts/
 │   │   └── Layout.astro       # Main page layout
+│   ├── styles/
+│   │   └── global.css         # Tailwind v4 entry, design tokens, global styles
 │   ├── pages/
 │   │   ├── index.astro        # Homepage
 │   │   └── 404.astro          # Error page

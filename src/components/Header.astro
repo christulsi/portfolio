@@ -14,9 +14,9 @@ const links = [
 <header class="sticky top-0 z-[1000] border-b border-line/70 bg-canvas/95 transition-colors">
   <!-- No backdrop-filter here: it would become the containing block for the
        fixed-position mobile drawer and backdrop below. -->
-  <nav class="container flex h-16 items-center gap-2 md:h-20 md:gap-6" aria-label="Primary">
+  <nav class="page-width flex h-16 items-center gap-2 md:h-20 md:gap-6" aria-label="Primary">
     <a href={base} class="mr-auto flex items-center gap-3 text-ink no-underline">
-      <svg viewBox="0 0 32 32" class="h-8 w-8 flex-shrink-0" aria-hidden="true" focusable="false">
+      <svg viewBox="0 0 32 32" class="h-8 w-8 shrink-0" aria-hidden="true" focusable="false">
         <rect width="32" height="32" rx="9" fill="#0c4a34"></rect>
         <path d="M9 8.5 24.5 16 9 23.5Z" fill="#f4c430" stroke="#ecf5ef" stroke-width="1.5"></path>
       </svg>
@@ -39,7 +39,7 @@ const links = [
               href={`${base}#${link.id}`}
               data-magnetic={link.id === 'contact' ? '' : undefined}
               class:list={[
-                'block font-heading text-3xl text-ink no-underline md:text-[0.95rem] md:font-semibold md:tracking-normal md:[font-stretch:100%]',
+                'block font-heading text-3xl text-ink no-underline md:text-[0.95rem] md:leading-9 md:font-semibold md:tracking-normal md:[font-stretch:100%]',
                 link.id === 'contact'
                   ? 'md:ml-2 md:rounded-full md:bg-gold md:px-5 md:py-2.5 md:text-on-gold md:hover:bg-gold/85'
                   : 'hover:text-link md:rounded-full md:px-4 md:py-2.5 md:hover:bg-sunken md:hover:text-ink',
@@ -53,7 +53,7 @@ const links = [
     </div>
     <button
       id="theme-toggle"
-      class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border border-line text-ink transition-colors hover:bg-sunken"
+      class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line text-ink transition-colors hover:bg-sunken"
       aria-label="Toggle dark mode"
     >
       <Icon name="heroicons:sun-20-solid" class="sun-icon hidden h-5 w-5 dark:block" />

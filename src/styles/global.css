@@ -1,0 +1,322 @@
+/* Explicit subpath: Vite 8 inlines CSS @imports with its own resolver, which
+   doesn't apply the package's `style` export condition to a bare
+   `@import 'tailwindcss'` (that form fails with ENOENT under Astro 7). */
+@import 'tailwindcss/index.css';
+/* Reuse the JS config (themed color tokens, fonts, radii, dark mode). */
+@config '../../tailwind.config.mjs';
+
+/* NEW: page measure for every section — wider grid, fluid gutters. Named
+   `page-width` rather than `container`: Tailwind v4 ships a built-in
+   `container` utility whose breakpoint max-widths would still apply. */
+@utility page-width {
+  width: 100%;
+  max-width: 84rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
+}
+
+/* Two-step type scale on Archivo's width axis. The widest, heaviest cut is
+   reserved for the name (and the wordmark/404 that echo it) — the site's one
+   loud typographic move. Headings step down in both width and weight. */
+@utility font-display {
+  font-stretch: 125%;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+@utility font-heading {
+  font-stretch: 112%;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+@layer base {
+  /* Tailwind v4 defaults borders to currentColor and buttons to the default
+     cursor; restore the v3 behaviour this design was built on. */
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: rgb(var(--line));
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+
+  /* Palette: the forest green and gold of Guyana's Golden Arrowhead. Values
+     are RGB channels so Tailwind opacity modifiers work (see tailwind.config). */
+  :root {
+    --canvas: 243 246 242; /* #F3F6F2 */
+    --surface: 255 255 255;
+    --sunken: 230 237 231; /* #E6EDE7 */
+    --ink: 14 34 25; /* #0E2219 */
+    --muted: 75 97 87; /* #4B6157 */
+    --line: 211 221 214; /* #D3DDD6 */
+    --link: 10 107 71; /* #0A6B47 */
+    --gold: 244 196 48; /* #F4C430 */
+    --on-gold: 14 34 25;
+    --forest: 12 74 52; /* #0C4A34 */
+    --on-forest: 236 245 239; /* #ECF5EF */
+    color-scheme: light;
+  }
+
+  [data-theme='dark'] {
+    /* Deep forest, not near-black: the canvas is the light theme's ink. */
+    --canvas: 14 34 25; /* #0E2219 */
+    --surface: 20 48 39; /* #143027 */
+    --sunken: 27 58 47; /* #1B3A2F */
+    --ink: 233 241 236; /* #E9F1EC */
+    --muted: 159 182 171; /* #9FB6AB */
+    --line: 42 74 61; /* #2A4A3D */
+    --link: 244 196 48; /* gold reads as the link color on dark green */
+    --forest: 15 84 59; /* #0F543B */
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* NEW: Lenis drives the scroll position itself; native smoothing would
+     fight every frame it sets. */
+  html.lenis {
+    scroll-behavior: auto;
+  }
+
+  /* NEW: 17px body on a 1.65 rhythm — a touch larger and airier. */
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    /* Plain value, not `@apply leading-tight`: in Tailwind v4 that sets
+       --tw-leading, which text-* utilities would then inherit. */
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  p,
+  li,
+  blockquote {
+    text-wrap: pretty;
+  }
+
+  a {
+    @apply text-link underline-offset-4 transition-colors;
+  }
+
+  ::selection {
+    background: rgb(var(--gold));
+    color: rgb(var(--on-gold));
+  }
+
+  :focus-visible {
+    outline: 3px solid rgb(var(--link));
+    outline-offset: 3px;
+  }
+
+  *:focus:not(:focus-visible) {
+    @apply outline-none;
+  }
+}
+
+@layer components {
+  /* NEW: more air between sections and a bigger, tighter heading scale. */
+  .section {
+    padding-block: clamp(5rem, 11vw, 9rem);
+  }
+
+  .section-head {
+    @apply mb-10 flex flex-col gap-4 md:mb-16 md:flex-row md:items-end md:justify-between md:gap-12;
+  }
+
+  .section-title {
+    @apply font-heading;
+    font-size: clamp(2.6rem, 6.2vw, 5.5rem);
+    line-height: 0.96;
+    letter-spacing: -0.035em;
+  }
+
+  .section-intro {
+    @apply max-w-md text-lg text-muted md:text-right;
+  }
+
+  /* NEW: lead paragraph size, shared by the hero and project pages. */
+  .lede {
+    font-size: clamp(1.15rem, 1.5vw, 1.375rem);
+    line-height: 1.5;
+  }
+
+  /* Bento tiles. Treatments vary by role rather than one card style everywhere. */
+  .tile {
+    @apply rounded-tile p-6 md:p-8;
+  }
+
+  .tile-surface {
+    @apply border border-line bg-surface;
+  }
+
+  .tile-sunken {
+    @apply bg-sunken;
+  }
+
+  .tile-forest {
+    @apply bg-forest text-on-forest;
+  }
+
+  .tile-gold {
+    @apply bg-gold text-on-gold;
+  }
+
+  .btn {
+    @apply inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 font-semibold no-underline transition;
+  }
+
+  .btn-gold {
+    @apply bg-gold text-on-gold hover:bg-gold/85;
+  }
+
+  .btn-ghost {
+    @apply border border-line text-ink hover:border-ink;
+  }
+
+  .chip {
+    @apply inline-block rounded-full border px-3 py-1 text-sm leading-snug;
+  }
+
+  .skip-link {
+    @apply absolute -top-24 left-4 z-[10000] rounded-full bg-gold px-6 py-3 font-semibold text-on-gold no-underline focus:top-4;
+  }
+
+  /* Site-wide constellation background. Sits above the body background but
+     behind all page content; never intercepts pointer events. */
+  #three-root {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* NEW: Masked words for staggered heading reveals (motion/split.ts). The
+     padding/negative-margin pair keeps ascenders and descenders unclipped
+     without changing the line box. */
+  .split-word {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding-block: 0.12em 0.14em;
+    margin-block: -0.12em -0.14em;
+  }
+
+  .split-inner {
+    display: inline-block;
+  }
+
+  /* NEW: Intro states. Hidden only while JS-driven motion is allowed and the
+     intro hasn't finished; the failsafe reveals everything if the motion
+     script never starts. */
+  html.motion:not(.intro-done) [data-intro-item] {
+    opacity: 0;
+  }
+
+  html.motion:not(.intro-done) .hero-line > span {
+    transform: translateY(105%);
+  }
+
+  html.motion:not(.intro-done):not(.intro-running) :is([data-intro-item], .hero-line > span) {
+    animation: intro-failsafe 0.6s ease-out 4s forwards;
+  }
+
+  @keyframes intro-failsafe {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* NEW: 3D tilt cards (motion/tilt.ts) and their pointer-following sheen. */
+  .tilt-stage {
+    perspective: 1400px;
+  }
+
+  [data-tilt] {
+    transform-style: preserve-3d;
+  }
+
+  /* NEW: native cursor hidden while the custom one is active, except where
+     typing needs the caret. */
+  html.has-cursor,
+  html.has-cursor * {
+    cursor: none;
+  }
+
+  html.has-cursor :is(input, textarea, select, [contenteditable='true']) {
+    cursor: auto;
+  }
+
+  /* One orchestrated entrance, used by the hero tiles only. */
+  .rise {
+    animation: rise 640ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(var(--i, 0) * 80ms);
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Form field validation states (toggled by @utils/form) */
+  .field-valid {
+    border-color: #1f8a5b !important;
+  }
+
+  .field-invalid {
+    border-color: #c2410c !important;
+  }
+
+  .field-icon {
+    position: absolute;
+    right: 12px;
+    top: 2.9rem;
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .rise {
+    animation: none;
+  }
+}
+
+/* NEW: never print half-revealed content. */
+@media print {
+  [data-reveal],
+  [data-reveal] > *,
+  .split-inner,
+  [data-intro-item],
+  .hero-line > span {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+}

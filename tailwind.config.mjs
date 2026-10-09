@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
-// Colors are CSS variables (RGB channels) defined per theme in Layout.astro, so
+// Loaded by Tailwind v4 through `@config` in src/styles/global.css.
+// Colors are CSS variables (RGB channels) defined per theme in global.css, so
 // one utility like `bg-surface` works in both light and dark mode and still
 // supports opacity modifiers (`bg-surface/80`).
 const token = (name) => `rgb(var(--${name}) / <alpha-value>)`;
@@ -8,11 +9,6 @@ const token = (name) => `rgb(var(--${name}) / <alpha-value>)`;
 export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
   darkMode: ['class', '[data-theme="dark"]'],
-  // `.container` is defined in Layout.astro; Tailwind's own container utility
-  // would override its max-width from the later utilities layer.
-  corePlugins: {
-    container: false,
-  },
   theme: {
     extend: {
       fontFamily: {

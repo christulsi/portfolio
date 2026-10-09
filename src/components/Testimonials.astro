@@ -5,7 +5,7 @@ const testimonialEntries = await getCollection('testimonials');
 const testimonials = testimonialEntries.map((entry) => entry.data);
 ---
 
-<section class="section container" aria-labelledby="testimonials-title">
+<section class="section page-width" aria-labelledby="testimonials-title">
   <div class="section-head">
     <h2 id="testimonials-title" class="section-title" data-reveal="title">
       From the people I work with
@@ -19,7 +19,7 @@ const testimonials = testimonialEntries.map((entry) => entry.data);
   >
     {testimonials.map((testimonial) => (
       <figure class="flex flex-col justify-between gap-6 md:px-8 md:first:pl-0 md:last:pr-0">
-        <blockquote class="text-lg leading-relaxed md:text-xl">
+        <blockquote class="text-lg leading-relaxed md:text-xl/7">
           <p class="-indent-[0.45em]">“{testimonial.text}”</p>
         </blockquote>
         <figcaption class="text-sm">
