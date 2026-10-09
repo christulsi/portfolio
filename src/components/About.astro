@@ -5,61 +5,51 @@ const skillEntries = await getCollection('skills');
 const categories = skillEntries.map((entry) => entry.data);
 ---
 
-<section id="about" class="relative bg-transparent py-24">
-  <div class="container relative z-10">
-    <div class="fade-in mb-14 max-w-2xl">
-      <p class="kicker"><span class="text-primary">01</span>&nbsp;&nbsp;/&nbsp;&nbsp;About</p>
-      <h2 class="section-title mt-5">
-        Engineering systems that stay <em class="font-display italic text-primary">up</em>.
-      </h2>
+<section id="about" class="section page-width" aria-labelledby="about-title">
+  <div class="section-head">
+    <h2 id="about-title" class="section-title" data-reveal="title">
+      About
+    </h2>
+    <p class="section-intro" data-reveal="fade">
+      Working inside government IT since 2019, from writing the apps to keeping them running.
+    </p>
+  </div>
+
+  <div class="grid gap-10 lg:grid-cols-12 lg:gap-4">
+    <div class="space-y-5 text-lg lg:col-span-7 lg:pr-8" data-reveal="stagger">
+      <p class="text-xl leading-relaxed md:text-2xl md:leading-snug">
+        I'm a Senior ICT Engineer at Guyana's National Data Management Authority, where I lead ICT
+        infrastructure and technical support and deliver digital transformation projects for
+        government. Proactive monitoring and automation have raised system uptime by 15%.
+      </p>
+      <p class="text-muted">
+        I hold a Master's in Computer Software Engineering from Nankai University and a Bachelor's
+        in Computer Science from the University of Guyana, and I'm an AWS Certified Cloud
+        Practitioner.
+      </p>
+      <p class="text-muted">
+        I care about systems that stay up, deploy without drama, and make sense to the next engineer
+        who opens them. That's why most of my work ends up touching DevOps and automation, and why I
+        spend time mentoring junior engineers.
+      </p>
     </div>
 
-    <div class="grid gap-14 md:grid-cols-[1fr_1fr] lg:gap-20">
-      <div class="fade-in space-y-6 text-lg leading-relaxed text-muted">
-        <p>
-          With a Master's in Computer Software Engineering from Nankai University and a Bachelor's
-          in Computer Science from the University of Guyana, I bring a solid academic foundation to
-          my work.
-        </p>
-        <p>
-          As a Senior ICT Engineer at the National Data Management Authority, I've led digital
-          transformation initiatives, improved system uptime by 15%, and mentored junior engineers
-          to foster continuous learning and growth.
-        </p>
-        <p>
-          I'm driven by optimizing systems, implementing DevOps best practices, and leveraging
-          emerging technologies to solve complex business challenges — an AWS Certified Cloud
-          Practitioner with full-stack and cloud-infrastructure expertise.
-        </p>
-      </div>
-
-      <div class="fade-in panel p-8">
-        <h3 class="font-mono text-xs uppercase tracking-[0.28em] text-muted">Skills &amp; Stack</h3>
-        <div class="mt-8 flex flex-col gap-8">
-          {
-            categories.map((category, catIndex) => (
-              <div>
-                <h4 class="flex items-center gap-2 text-sm font-semibold text-ink">
-                  <span class="font-mono text-xs text-primary">
-                    {String(catIndex + 1).padStart(2, '0')}
-                  </span>
-                  {category.name}
-                </h4>
-                <div class="mt-4 flex flex-wrap gap-2.5">
-                  {category.skills.map((skill, skillIndex) => (
-                    <span
-                      class="skill-tag animate-fade-in-up"
-                      style={`animation-delay: ${(catIndex * 6 + skillIndex) * 70}ms;`}
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))
-          }
-        </div>
-      </div>
+    <div class="tile tile-sunken lg:col-span-5" data-reveal="fade">
+      <h3 class="mb-2 text-xl font-semibold">Toolkit</h3>
+      <dl>
+        {categories.map((category) => (
+          <div class="border-b border-line py-5 last:border-b-0 last:pb-0">
+            <dt class="mb-3 text-sm font-medium text-muted">{category.name}</dt>
+            <dd>
+              <ul class="flex flex-wrap gap-2">
+                {category.skills.map((skill) => (
+                  <li class="chip border-line bg-surface">{skill}</li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        ))}
+      </dl>
     </div>
   </div>
 </section>

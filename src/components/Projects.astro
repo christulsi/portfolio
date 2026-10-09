@@ -1,32 +1,40 @@
 ---
 import { getCollection } from 'astro:content';
 
+import { sortByOrder } from '../utils/content';
+
 import ProjectCard from './ProjectCard.astro';
 
-const projectEntries = await getCollection('projects');
-const projects = projectEntries.map((entry) => entry.data);
+// NEW: keep each entry's id as its slug (detail-page URL).
+const projects = sortByOrder(
+  (await getCollection('projects')).map((entry) => ({ ...entry.data, slug: entry.id }))
+);
+
+// Alternating wide/narrow tiles give the grid a bento rhythm; the lead project
+// gets the forest treatment.
+const layout = [
+  { variant: 'forest', span: 'lg:col-span-7' },
+  { variant: 'surface', span: 'lg:col-span-5' },
+  { variant: 'surface', span: 'lg:col-span-5' },
+  { variant: 'sunken', span: 'lg:col-span-7' },
+] as const;
 ---
 
-<section id="projects" class="relative bg-transparent py-24">
-  <div class="container relative z-10">
-    <div class="fade-in mb-14 flex flex-wrap items-end justify-between gap-6">
-      <div class="max-w-2xl">
-        <p class="kicker">
-          <span class="text-primary">02</span>&nbsp;&nbsp;/&nbsp;&nbsp;Selected Work
-        </p>
-        <h2 class="section-title mt-5">Featured Projects</h2>
-      </div>
-      <p class="font-mono text-sm text-muted">{projects.length} systems shipped</p>
-    </div>
+<section id="projects" class="section page-width" aria-labelledby="projects-title">
+  <div class="section-head">
+    <h2 id="projects-title" class="section-title" data-reveal="title">
+      Selected work
+    </h2>
+    <p class="section-intro" data-reveal="fade">
+      Systems for government agencies in Guyana, and the tooling that keeps them shipping.
+    </p>
+  </div>
 
-    <div class="grid gap-6 md:grid-cols-2">
-      {
-        projects.map((project, index) => (
-          <div class="fade-in" style={`transition-delay: ${index * 90}ms;`}>
-            <ProjectCard {...project} index={index} />
-          </div>
-        ))
-      }
-    </div>
+  <!-- NEW: `tilt-stage` gives the cards perspective; `data-reveal` staggers them in. -->
+  <div class="tilt-stage grid gap-3 md:gap-4 lg:grid-cols-12" data-reveal="stagger">
+    {projects.map((project, index) => {
+      const slot = layout[index % layout.length] ?? layout[1];
+      return <ProjectCard {...project} variant={slot.variant} class={slot.span} />;
+    })}
   </div>
 </section>

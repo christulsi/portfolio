@@ -127,11 +127,16 @@ export default [
     },
   },
 
-  // JS files: project rules but no TS parser
+  // JS files: project rules but no TS parser. The typescript-eslint variant of
+  // no-unused-vars needs TS scope analysis (since 8.7x it reports every
+  // variable as "only used as a type" under espree), so plain JS uses the core
+  // rule with the same options.
   {
     files: ['**/*.{js,mjs,cjs}'],
     rules: {
       ...projectRules,
+      '@typescript-eslint/no-unused-vars': 'off',
+      'no-unused-vars': projectRules['@typescript-eslint/no-unused-vars'],
       '@typescript-eslint/no-var-requires': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
     },

@@ -1,10 +1,9 @@
 ---
-
 ---
 
 <button
   id="scroll-to-top"
-  class="fixed bottom-8 right-8 z-50 flex h-11 w-11 cursor-pointer items-center justify-center rounded-md border border-primary/50 bg-canvas/80 text-primary backdrop-blur-md transition-all duration-300 opacity-0 invisible hover:-translate-y-0.5 hover:bg-primary hover:text-[rgb(var(--accent-contrast))]"
+  class="fixed bottom-6 right-6 z-50 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-ink text-canvas opacity-0 shadow-lg invisible transition-all duration-300 hover:bg-ink/85 md:bottom-8 md:right-8"
   aria-label="Scroll to top"
 >
   <svg
@@ -14,12 +13,16 @@
     fill="none"
     stroke="currentColor"
     stroke-width="2"
+    aria-hidden="true"
   >
     <polyline points="18 15 12 9 6 15"></polyline>
   </svg>
 </button>
 
 <script>
+  // NEW: Lenis-aware scrolling (falls back to native smooth scrolling).
+  import { scrollToTarget } from '../scripts/motion/scroll-to';
+
   // Window-scoped state — listeners are attached once and persist across SPA navigations.
   let isVisible = false;
   let ticking = false;
@@ -51,8 +54,6 @@
   );
 
   document.addEventListener('astro:page-load', () => {
-    document
-      .getElementById('scroll-to-top')
-      ?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    document.getElementById('scroll-to-top')?.addEventListener('click', () => scrollToTarget(0));
   });
 </script>

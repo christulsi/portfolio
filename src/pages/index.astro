@@ -8,18 +8,17 @@ import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
 import Projects from '../components/Projects.astro';
 import ScrollToTop from '../components/ScrollToTop.astro';
-import Stats from '../components/Stats.astro';
 import Testimonials from '../components/Testimonials.astro';
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Chris Tulsi - Senior ICT Engineer Portfolio">
+<!-- NEW: `intro` enables the loader + hero entrance on this page only. -->
+<Layout title="Chris Tulsi - Senior ICT Engineer Portfolio" intro>
   <Header />
   <main id="main">
     <Hero />
-    <About />
-    <Stats />
     <Projects />
+    <About />
     <Experience />
     <Certifications />
     <Testimonials />

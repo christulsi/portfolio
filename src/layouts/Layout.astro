@@ -1,10 +1,14 @@
 ---
 import { SEO } from 'astro-seo';
 import { ClientRouter } from 'astro:transitions';
+// NEW: Lenis base styles (html height, stopped state).
+import 'lenis/dist/lenis.css';
 
+import Cursor from '../components/Cursor.astro';
+import Loader from '../components/Loader.astro';
 import Toast from '../components/Toast.astro';
 import { personJsonLd } from '../data/structured-data';
-
+// Global styles + Tailwind v4 entry (tokens, base, components, motion states).
 import '../styles/global.css';
 
 interface Props {
@@ -12,6 +16,8 @@ interface Props {
   description?: string;
   image?: string;
   type?: string;
+  /** NEW: page has the intro loader + hero entrance (home page). */
+  intro?: boolean;
 }
 
 const {
@@ -19,6 +25,7 @@ const {
   description = 'Senior ICT Engineer specializing in ERP, data engineering, and AI/ML solutions. Building scalable software for government and enterprise.',
   image = '/og-image.png',
   type = 'website',
+  intro = false,
 } = Astro.props;
 
 const base = import.meta.env.BASE_URL.endsWith('/')
@@ -29,7 +36,7 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-has-intro={intro ? '' : undefined}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -65,8 +72,8 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
       }}
       extend={{
         meta: [
-          { name: 'theme-color', content: '#0b0d11' },
-          { name: 'msapplication-TileColor', content: '#0b0d11' },
+          { name: 'theme-color', content: '#0c4a34' },
+          { name: 'msapplication-TileColor', content: '#0c4a34' },
           { name: 'generator', content: Astro.generator },
           { name: 'author', content: 'Chris Tulsi' },
           {
@@ -96,123 +103,126 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
 
     <!-- Structured Data (JSON-LD) for SEO -->
     <script is:inline type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
-
-    <!-- Type system: Instrument Serif (display) + Hanken Grotesk (UI/body) +
-         JetBrains Mono (data/labels). Loaded non-blocking (preload → stylesheet)
-         with display=swap so first paint never waits on the network. -->
+    <!-- Archivo (variable width + weight). Preloaded and applied without
+         blocking render; the expanded width drives the display type.
+         NEW: width range starts at 75 so the hero name can widen into place. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&display=swap"
       as="style"
       onload="this.onload=null;this.rel='stylesheet'"
     />
     <noscript>
       <link
-        href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&display=swap"
         rel="stylesheet"
       />
     </noscript>
     <script is:inline>
-      // Mark that JS is available so scroll-reveal content can default to hidden
-      // only when it can actually be revealed (see `.fade-in` styles).
-      document.documentElement.classList.add('js');
-
-      // Dark mode initialization (runs before page render to prevent flash)
-      // Priority: localStorage > system preference > light fallback
+      // Runs before first paint, once per full page load.
       (() => {
-        const stored = localStorage.getItem('theme');
-        if (stored === 'light' || stored === 'dark') {
-          document.documentElement.setAttribute('data-theme', stored);
-          return;
+        const root = document.documentElement;
+
+        // Dark mode: localStorage > system preference > light fallback.
+        let stored = null;
+        try {
+          stored = localStorage.getItem('theme');
+        } catch {
+          /* storage blocked */
         }
         const prefersDark =
           window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+        root.setAttribute(
+          'data-theme',
+          stored === 'light' || stored === 'dark' ? stored : prefersDark ? 'dark' : 'light'
+        );
+
+        // NEW: motion. `motion` gates every hidden-until-animated state in CSS,
+        // so reduced motion and no-JS always render the finished page.
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          root.classList.add('motion');
+          // The intro loader plays once per session, on the home page, and not
+          // when the visitor deep-links to a section.
+          if (root.hasAttribute('data-has-intro') && !location.hash) {
+            try {
+              if (sessionStorage.getItem('intro-seen') !== '1') {
+                sessionStorage.setItem('intro-seen', '1');
+                root.classList.add('is-loading');
+              }
+            } catch {
+              /* storage blocked: skip the loader */
+            }
+          }
+        }
+
+        // NEW: client-side navigation replaces <html>'s attributes with the
+        // next page's server-rendered ones. Carry runtime state across: the
+        // theme, and classes like `motion`, `intro-done`, `has-cursor`, `lenis`.
+        document.addEventListener('astro:before-swap', (ev) => {
+          const next = ev.newDocument.documentElement;
+          next.setAttribute('data-theme', root.getAttribute('data-theme') || 'light');
+          root.classList.forEach((name) => {
+            if (name !== 'is-loading' && name !== 'intro-running') next.classList.add(name);
+          });
+        });
       })();
     </script>
   </head>
   <body>
-    <!-- Blueprint grid + atmospheric depth. Sits at the very back; pure CSS,
-         theme-aware via custom properties. -->
-    <div id="bg-grid" aria-hidden="true"></div>
     <!-- Site-wide constellation background: fixed, behind all content, and
          persisted across client-side navigations so it animates uninterrupted. -->
     <div id="three-root" transition:persist aria-hidden="true"></div>
-    <div id="scroll-progress" aria-hidden="true"></div>
-    <a href="#main" class="skip-link">Skip to main content</a>
+    <!-- NEW: intro loader (home only) and custom cursor (fine pointers only). -->
+    {intro && <Loader />}
+    <Cursor />
+    <a href="#main" class="skip-link">
+      Skip to main content
+    </a>
     <Toast />
     <slot />
     <script>
+      // NEW: the motion layer — Lenis, GSAP reveals, cursor, intro, 3D scroll.
+      import '../scripts/motion/index';
+      import { scrollToTarget } from '../scripts/motion/scroll-to';
+
       // Re-runs on every client-side navigation via ClientRouter, in addition to
       // the initial page load. DOMContentLoaded would only fire once.
-      function setupPage() {
-        // Intersection Observer for fade-in elements
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
-              }
-            });
-          },
-          { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-        );
-        document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
-
-        // Hash navigation after route change
-        if (location.hash) {
-          const id = location.hash.replace(/^#/, '');
-          setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 50);
-        }
-      }
-
-      // Single shared scroll handler for the progress bar; attached once per
-      // document. ClientRouter persists window listeners across navigations.
-      const scrollProgress = document.getElementById('scroll-progress');
-      let ticking = false;
-      function updateScrollProgress() {
-        const windowHeight =
-          document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrolled = windowHeight > 0 ? window.scrollY / windowHeight : 0;
-        if (scrollProgress) scrollProgress.style.transform = `scaleX(${scrolled})`;
-        ticking = false;
-      }
-      window.addEventListener(
-        'scroll',
-        () => {
-          if (!ticking) {
-            window.requestAnimationFrame(updateScrollProgress);
-            ticking = true;
-          }
-        },
-        { passive: true }
-      );
-      window.addEventListener('hashchange', () => {
+      function scrollToHash() {
         const id = location.hash.replace(/^#/, '');
         if (id) {
-          setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 50);
+          setTimeout(() => {
+            const target = document.getElementById(id);
+            if (target) scrollToTarget(target);
+          }, 50);
         }
-      });
+      }
 
-      document.addEventListener('astro:page-load', setupPage);
+      window.addEventListener('hashchange', scrollToHash);
+      document.addEventListener('astro:page-load', scrollToHash);
     </script>
     <script>
-      // Lazy-load the constellation background only when the device can handle
-      // it. Keeps the three.js chunk out of the critical path and off small /
-      // data-saver devices. The #three-root element persists across navigations
-      // and the module guards against double-init, so re-importing on each
-      // page-load is effectively free.
+      // Lazy-load the 3D scene (constellation + hero arrowhead). Keeps the
+      // three.js chunk out of the critical path and off data-saver devices.
+      // The #three-root element persists across navigations and the module
+      // guards against double-init, so re-importing on each page-load is
+      // effectively free.
       function maybeLoadThree() {
         try {
           if (localStorage.getItem('disableThree') === '1') return;
           const conn = (navigator as Navigator & { connection?: { saveData?: boolean } })
             .connection;
           if (conn?.saveData) return;
-          if (window.innerWidth < 640) return;
-          void import('../scripts/three/index.ts');
+          const load = () => void import('../scripts/three/index.ts');
+          // NEW: phones get a lighter scene (it used to be skipped below 640px),
+          // loaded once the main thread is idle so it never competes with first
+          // paint.
+          if (window.innerWidth < 768 && 'requestIdleCallback' in window) {
+            window.requestIdleCallback(load, { timeout: 2500 });
+          } else {
+            load();
+          }
         } catch (err) {
           console.error('Failed to load constellation background:', err);
         }

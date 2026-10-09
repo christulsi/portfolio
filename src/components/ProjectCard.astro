@@ -1,60 +1,128 @@
 ---
+import { projectPath } from '../utils/content';
+
+import ProjectCover from './ProjectCover.astro';
+
 interface Props {
+  /** NEW: collection id; used for the detail-page URL and view-transition names. */
+  slug: string;
   title: string;
   description: string;
   technologies: string[];
   githubUrl?: string;
   liveUrl?: string;
-  index?: number;
+  client?: string;
+  outcome?: string;
+  cover?: string;
+  /** Tile treatment; the Projects grid alternates these for bento rhythm. */
+  variant?: 'forest' | 'surface' | 'sunken';
+  class?: string;
 }
 
-const { title, description, technologies, githubUrl, index = 0 } = Astro.props;
-const label = String(index + 1).padStart(2, '0');
+const {
+  slug,
+  title,
+  description,
+  technologies,
+  githubUrl,
+  client,
+  outcome,
+  cover,
+  variant = 'surface',
+  class: className,
+} = Astro.props;
+
+const onForest = variant === 'forest';
+const href = projectPath(import.meta.env.BASE_URL ?? '/', slug);
 ---
 
-<article class="panel panel-interactive group relative flex h-full flex-col overflow-hidden p-8">
-  <!-- top accent line traces in on hover -->
-  <span
-    class="absolute left-0 top-0 h-px w-full origin-left scale-x-0 bg-gradient-to-r from-primary to-secondary transition-transform duration-500 group-hover:scale-x-100"
-    aria-hidden="true"></span>
-
-  <div class="flex items-start justify-between">
-    <span class="font-mono text-xs tracking-widest text-muted">PROJ_{label}</span>
+<!--
+  NEW: the whole card links to the project page (the title link's ::after
+  covers the card), tilts toward the pointer (`data-tilt`, motion/tilt.ts),
+  shows the "View" cursor, and opens its cover on hover. The cover and title
+  carry view-transition names so they morph into the project page.
+-->
+<article
+  data-tilt
+  data-cursor="view"
+  data-cursor-label="View"
+  class:list={[
+    'project-card tile group relative flex h-full flex-col gap-6',
     {
-      githubUrl && (
-        <a
-          href={githubUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${title} source on GitHub`}
-          class="text-muted transition-colors hover:text-primary"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-          </svg>
-        </a>
-      )
-    }
-  </div>
+      'tile-forest': variant === 'forest',
+      'tile-surface': variant === 'surface',
+      'tile-sunken': variant === 'sunken',
+    },
+    className,
+  ]}
+>
+  <ProjectCover slug={slug} title={title} outcome={outcome} cover={cover} onForest={onForest} />
 
-  <h3 class="mt-5 text-xl font-bold leading-snug text-ink">{title}</h3>
-  <p class="mt-3 flex-grow leading-relaxed text-muted">{description}</p>
+  {client && (
+    <p class:list={['text-sm', onForest ? 'text-on-forest/80' : 'text-muted']}>{client}</p>
+  )}
 
-  <div class="mt-6 flex flex-wrap gap-2">
-    {technologies.map((tech) => <span class="tag">{tech}</span>)}
-  </div>
-
-  {
-    githubUrl && (
+  <div class="grow">
+    <h3
+      class="font-heading text-[1.65rem] leading-[1.05] md:text-[2rem]"
+      transition:name={`project-title-${slug}`}
+    >
       <a
-        href={githubUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="mt-7 inline-flex items-center gap-2 font-mono text-sm text-primary transition-all hover:gap-3"
+        href={href}
+        class="text-current no-underline after:absolute after:inset-0 after:rounded-tile after:content-[''] hover:underline"
       >
-        View source
-        <span aria-hidden="true">→</span>
+        {title}
       </a>
-    )
-  }
+    </h3>
+    <p class:list={['mt-4 max-w-prose', onForest ? 'text-on-forest/85 md:text-lg' : 'text-muted']}>
+      {description}
+    </p>
+  </div>
+
+  <ul class="flex flex-wrap gap-2" aria-label={`Technologies used in ${title}`}>
+    {technologies.map((tech) => (
+      <li class:list={['chip', onForest ? 'border-on-forest/30' : 'border-line bg-surface']}>
+        {tech}
+      </li>
+    ))}
+  </ul>
+
+  {githubUrl && (
+    <a
+      href={githubUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class:list={['relative z-10 font-semibold underline', onForest && 'text-on-forest']}
+    >
+      View source on GitHub
+    </a>
+  )}
 </article>
+
+<style>
+  /* NEW: pointer-following sheen; position comes from motion/tilt.ts. It sits
+     between the card background and its content (isolate + z-index -1). */
+  .project-card {
+    isolation: isolate;
+  }
+
+  .project-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      circle at var(--px, 50%) var(--py, 0%),
+      rgb(255 255 255 / 0.16),
+      transparent 45%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .project-card:hover::before {
+    opacity: 1;
+  }
+</style>

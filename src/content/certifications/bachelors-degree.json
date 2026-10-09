@@ -2,5 +2,6 @@
   "name": "Bachelor's Degree in Computer Science",
   "issuer": "University of Guyana",
   "date": "Completed",
-  "icon": "🎓"
+  "icon": "🎓",
+  "order": 3
 }

@@ -1,11 +1,11 @@
 {
   "name": "Chris Tulsi - Portfolio",
   "short_name": "Chris Tulsi",
-  "description": "Senior ICT Engineer Portfolio - Building elegant solutions to complex problems",
+  "description": "Senior ICT Engineer building the software behind public services in Guyana",
   "start_url": "/portfolio/",
   "display": "standalone",
-  "background_color": "#0b0d11",
-  "theme_color": "#0b0d11",
+  "background_color": "#f3f6f2",
+  "theme_color": "#0c4a34",
   "icons": [
     {
       "src": "/portfolio/favicon.svg",

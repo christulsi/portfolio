@@ -12,6 +12,9 @@ export const ExperienceSchema = z.object({
   period: z.string().min(1, 'Period is required'),
   description: z.string().min(1, 'Description is required'),
   achievements: z.array(z.string()).min(1, 'At least one achievement is required'),
+  // Display position (ascending). Collections load alphabetically by filename,
+  // so this is what keeps the list reverse-chronological.
+  order: z.number().int().optional(),
 });
 
 export const ExperiencesSchema = z.array(ExperienceSchema);
@@ -23,6 +26,13 @@ export const ProjectSchema = z.object({
   technologies: z.array(z.string()).min(1, 'At least one technology is required'),
   liveUrl: z.string().url('Invalid URL').optional(),
   githubUrl: z.string().url('Invalid URL').optional(),
+  // Who the work was for, and its headline result, shown on the project tile.
+  client: z.string().min(1).optional(),
+  // NEW: optional screenshot/preview path under public/ (e.g. "/projects/erp.webp").
+  // Without one, the card shows a generated cover in the site palette.
+  cover: z.string().min(1).optional(),
+  outcome: z.string().min(1).optional(),
+  order: z.number().int().optional(),
 });
 
 export const ProjectsSchema = z.array(ProjectSchema);
@@ -35,6 +45,7 @@ export const CertificationSchema = z.object({
   icon: z.string().min(1, 'Icon is required'),
   credentialId: z.string().optional(),
   verifyUrl: z.string().url('Invalid verification URL').optional(),
+  order: z.number().int().optional(),
 });
 
 export const CertificationsSchema = z.array(CertificationSchema);

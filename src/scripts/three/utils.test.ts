@@ -8,6 +8,8 @@ import {
   isDataSaverEnabled,
   lerp,
   pickNodeCount,
+  pickPixelRatio,
+  isSmallViewport,
   prefersReducedMotion,
   shouldEnablePointer,
 } from './utils';
@@ -137,5 +139,51 @@ describe('shouldEnablePointer', () => {
       .fn()
       .mockReturnValue({ matches: true }) as unknown as typeof window.matchMedia;
     expect(shouldEnablePointer()).toBe(true);
+  });
+});
+
+describe('pickPixelRatio', () => {
+  afterEach(() => {
+    define(window, 'innerWidth', 1024);
+    define(window, 'devicePixelRatio', 1);
+  });
+
+  it('caps desktop rendering at 2x', () => {
+    define(window, 'innerWidth', 1440);
+    define(window, 'devicePixelRatio', 3);
+    expect(pickPixelRatio()).toBe(2);
+  });
+
+  it('caps phone rendering at 1.5x', () => {
+    define(window, 'innerWidth', 390);
+    define(window, 'devicePixelRatio', 3);
+    expect(pickPixelRatio()).toBe(1.5);
+  });
+
+  it('never upscales a 1x screen', () => {
+    define(window, 'innerWidth', 1440);
+    define(window, 'devicePixelRatio', 1);
+    expect(pickPixelRatio()).toBe(1);
+  });
+});
+
+describe('isSmallViewport', () => {
+  afterEach(() => define(window, 'innerWidth', 1024));
+
+  it('is true below 768px', () => {
+    define(window, 'innerWidth', 390);
+    expect(isSmallViewport()).toBe(true);
+    define(window, 'innerWidth', 1024);
+    expect(isSmallViewport()).toBe(false);
+  });
+});
+
+describe('pickNodeCount on phones', () => {
+  afterEach(() => define(window, 'innerWidth', 1024));
+
+  it('uses the lightest field below 640px', () => {
+    define(window, 'innerWidth', 390);
+    define(navigator, 'deviceMemory', undefined);
+    expect(pickNodeCount()).toBe(60);
   });
 });

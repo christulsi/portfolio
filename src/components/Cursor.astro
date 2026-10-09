@@ -1,0 +1,113 @@
+---
+// NEW: Custom cursor — a gold dot that tracks the pointer and a trailing ring
+// that grows over links and shows "View" over project cards. Only rendered
+// visible when src/scripts/motion/cursor.ts adds `html.has-cursor` (fine
+// pointer, motion allowed). Persisted across navigations so it never flickers.
+---
+
+<div id="cursor" aria-hidden="true" transition:persist>
+  <div class="cursor-ring">
+    <span class="cursor-ring-shape"></span>
+    <span class="cursor-label"></span>
+  </div>
+  <div class="cursor-dot"></div>
+</div>
+
+<style>
+  #cursor {
+    display: none;
+  }
+
+  :global(html.has-cursor) #cursor {
+    display: block;
+    position: fixed;
+    inset: 0 auto auto 0;
+    z-index: 10003;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  :global(html.has-cursor) #cursor:global(.is-visible) {
+    opacity: 1;
+  }
+
+  :global(html.has-cursor) #cursor:global(.is-hidden) {
+    opacity: 0;
+  }
+
+  /* GSAP positions these two with x/y transforms; visual state changes happen
+     on the inner shape so they never fight over `transform`. */
+  .cursor-dot,
+  .cursor-ring {
+    position: fixed;
+    left: 0;
+    top: 0;
+  }
+
+  .cursor-dot {
+    width: 8px;
+    height: 8px;
+    margin: -4px 0 0 -4px;
+    border-radius: 50%;
+    background: rgb(var(--gold));
+    transition: opacity 0.2s ease;
+  }
+
+  .cursor-ring {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+  }
+
+  .cursor-ring-shape {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 1.5px solid rgb(var(--ink) / 0.45);
+    transition:
+      transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+      background-color 0.3s ease,
+      border-color 0.3s ease;
+  }
+
+  .cursor-label {
+    grid-area: 1 / 1;
+    /* Above the scaled shape (a transform paints over non-positioned siblings). */
+    position: relative;
+    z-index: 1;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: rgb(var(--on-gold));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  #cursor:global(.is-link) .cursor-ring-shape {
+    transform: scale(1.5);
+    border-color: rgb(var(--gold));
+    background: rgb(var(--gold) / 0.16);
+  }
+
+  #cursor:global(.is-view) .cursor-ring-shape {
+    transform: scale(2.2);
+    border-color: transparent;
+    background: rgb(var(--gold));
+  }
+
+  #cursor:global(.is-view) .cursor-label {
+    opacity: 1;
+  }
+
+  #cursor:global(.is-view) .cursor-dot,
+  #cursor:global(.is-link) .cursor-dot {
+    opacity: 0;
+  }
+
+  #cursor:global(.is-pressed) .cursor-ring-shape {
+    transform: scale(0.8);
+  }
+</style>

@@ -117,14 +117,22 @@ test.describe('Performance & Core Web Vitals', () => {
   test('ships a reasonable amount of gzipped JS/CSS (production output)', () => {
     // GitHub Pages serves these assets gzipped, so measure the gzipped build
     // output rather than the preview server's uncompressed transfer size.
-    // three.js dominates the JS (~126KB gzipped) and is lazy-loaded, so it
-    // never blocks the initial render.
-    const jsGz = gzippedBytes(distFiles('.js'));
+    // Two budgets: what the home page loads up front (motion layer, router,
+    // contact form), and the total including the lazily imported 3D scene
+    // (three.js, ~135KB gzipped), which never blocks the initial render.
+    const html = readFileSync(join(DIST, 'index.html'), 'utf8');
+    const allJs = distFiles('.js');
+    const eagerJs = allJs.filter((f) => html.includes(f.split('/').pop() ?? ''));
+
+    const eagerGz = gzippedBytes(eagerJs);
+    const totalGz = gzippedBytes(allJs);
     const cssGz = gzippedBytes(distFiles('.css'));
 
-    console.log('Gzipped JS:', jsGz, 'CSS:', cssGz);
+    console.log('Gzipped JS — up front:', eagerGz, 'total:', totalGz, 'CSS:', cssGz);
 
-    expect(jsGz).toBeLessThan(200_000); // gzipped JS < 200KB
+    expect(eagerJs.length).toBeGreaterThan(0);
+    expect(eagerGz).toBeLessThan(100_000); // up-front JS < 100KB
+    expect(totalGz).toBeLessThan(240_000); // all JS incl. lazy 3D < 240KB
     expect(cssGz).toBeLessThan(40_000); // gzipped CSS < 40KB
   });
 

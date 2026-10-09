@@ -1,8 +1,9 @@
 /**
  * Generates the raster social/icon assets that crawlers need but design tools
  * normally export by hand:
- *   - public/og-image.png        (1200x630)  social link previews + JSON-LD
- *   - public/apple-touch-icon.png (180x180)  iOS home-screen icon
+ *   - public/og-image.png         (1200x630)  social link previews + JSON-LD
+ *   - public/apple-touch-icon.png (180x180)   iOS home-screen icon
+ *   - public/favicon-192x192.png  (192x192)   PNG favicon / manifest icon
  *
  * Rasterized with the Playwright chromium that is already a devDependency, so
  * there's no extra tooling. Re-run after changing the branding:
@@ -15,105 +16,78 @@ import { chromium } from '@playwright/test';
 
 const PUBLIC = resolve(dirname(fileURLToPath(import.meta.url)), '../public');
 
-const FONTS =
-  'https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@500;700&display=swap';
+// Brand: forest green and gold (Guyana's Golden Arrowhead), Archivo expanded.
+const FONT =
+  '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&display=block" />';
 
-// "Instrument" branding — warm ink canvas, signal-amber accent, blueprint grid,
-// editorial serif headline + mono labels. Mirrors the live site.
-const ogHtml = `<!doctype html><html><head><meta charset="utf-8" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="${FONTS}" />
-  <style>
+const mark = (size) => `<svg viewBox="0 0 512 512" width="${size}" height="${size}">
+  <rect width="512" height="512" rx="128" fill="#0c4a34"/>
+  <path d="M136 120 400 256 136 392Z" fill="#f4c430" stroke="#ecf5ef" stroke-width="24" stroke-linejoin="round"/>
+</svg>`;
+
+const ogHtml = `<!doctype html><html><head><meta charset="utf-8" />${FONT}<style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { width: 1200px; height: 630px; }
   body {
-    font-family: 'Hanken Grotesk', system-ui, sans-serif;
-    background:
-      radial-gradient(1000px 560px at 84% -14%, rgba(243, 178, 75, 0.22), transparent 62%),
-      #0b0d11;
-    color: #e9e5dc; display: flex; flex-direction: column; justify-content: space-between;
-    padding: 76px 84px; overflow: hidden; position: relative;
+    font-family: 'Archivo', system-ui, sans-serif; background: #f3f6f2; color: #0e2219;
+    display: grid; grid-template-columns: 1.6fr 1fr; grid-template-rows: 1fr 1fr; gap: 20px;
+    padding: 40px;
   }
-  /* blueprint grid */
-  .grid {
-    position: absolute; inset: 0;
-    background-image:
-      linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
-    background-size: 64px 64px;
-    -webkit-mask-image: radial-gradient(ellipse 120% 86% at 50% 0%, #000 30%, transparent 90%);
-  }
-  /* engineered corner ticks */
-  .tick { position: absolute; width: 26px; height: 26px; border: 2px solid rgba(243,178,75,0.55); }
-  .tl { top: 40px; left: 40px; border-right: 0; border-bottom: 0; }
-  .br { bottom: 40px; right: 40px; border-left: 0; border-top: 0; }
-  .layer { position: relative; z-index: 1; }
-  .badge { display: flex; align-items: center; gap: 22px; }
-  .mono {
-    width: 78px; height: 78px; border-radius: 14px; display: flex; align-items: center;
-    justify-content: center; font-family: 'JetBrains Mono', monospace; font-weight: 700;
-    font-size: 34px; letter-spacing: 1px; color: #f3b24b; border: 2px solid rgba(243,178,75,0.6);
-  }
-  .badge span { font-size: 32px; font-weight: 700; color: #e9e5dc; }
-  .kicker {
-    font-family: 'JetBrains Mono', monospace; font-size: 23px; font-weight: 500;
-    text-transform: uppercase; letter-spacing: 7px; color: #f3b24b;
-    display: flex; align-items: center; gap: 16px; margin-bottom: 26px;
-  }
-  .dot { width: 13px; height: 13px; border-radius: 50%; background: #5eead4; }
-  h1 { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 104px; line-height: 0.98; letter-spacing: -1px; color: #f6f3ec; }
-  h1 em { font-style: italic; color: #f3b24b; }
-  .tags { font-family: 'JetBrains Mono', monospace; font-size: 26px; color: #9fa5ac; letter-spacing: 1px; }
-  .url { font-family: 'JetBrains Mono', monospace; font-size: 24px; color: #f3b24b; font-weight: 500; margin-top: 14px; }
+  .tile { border-radius: 36px; padding: 44px; display: flex; flex-direction: column; justify-content: space-between; }
+  .intro { grid-row: span 2; background: #fff; border: 2px solid #d3ddd6; }
+  .badge { display: flex; align-items: center; gap: 16px; font-size: 26px; font-weight: 600; }
+  h1 { font-stretch: 125%; font-weight: 800; font-size: 132px; line-height: 0.86; letter-spacing: -5px; }
+  .lede { font-size: 28px; color: #4b6157; line-height: 1.35; }
+  .gold { background: #f4c430; }
+  .forest { background: #0c4a34; color: #ecf5ef; }
+  .small { font-size: 22px; opacity: 0.85; }
+  .big { font-size: 34px; font-weight: 700; line-height: 1.15; }
+  .url { font-stretch: 125%; font-weight: 800; font-size: 30px; }
 </style></head><body>
-  <div class="grid"></div><div class="tick tl"></div><div class="tick br"></div>
-  <div class="layer badge"><div class="mono">CT</div><span>Chris Tulsi</span></div>
-  <div class="layer">
-    <div class="kicker"><span class="dot"></span>Senior ICT Engineer</div>
-    <h1>Building reliable<br /><em>software &amp; infrastructure</em></h1>
+  <div class="tile intro">
+    <div class="badge">${mark(44)} Senior ICT Engineer</div>
+    <h1>Chris<br />Tulsi</h1>
+    <div class="lede">Building the software behind public services in Guyana.</div>
   </div>
-  <div class="layer">
-    <div class="tags">ERP &middot; DATA ENGINEERING &middot; AI/ML &middot; CLOUD &middot; DEVOPS</div>
+  <div class="tile gold">
+    <div class="small">ERP, platforms, pipelines</div>
+    <div class="big">National Data Management Authority</div>
+  </div>
+  <div class="tile forest">
+    <div class="small">Portfolio</div>
     <div class="url">christulsi.github.io/portfolio</div>
   </div>
 </body></html>`;
 
-const iconHtml = `<!doctype html><html><head><meta charset="utf-8" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="${FONTS}" />
-  <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 180px; height: 180px; }
-  body {
-    font-family: 'JetBrains Mono', monospace;
-    display: flex; align-items: center; justify-content: center;
-    background:
-      radial-gradient(140px 120px at 50% 0%, rgba(243,178,75,0.18), transparent 70%),
-      #0b0d11;
-    color: #f3b24b; font-weight: 700; font-size: 78px; letter-spacing: 2px;
-  }
-  .box { width: 132px; height: 132px; border: 4px solid #f3b24b; border-radius: 26px; display: flex; align-items: center; justify-content: center; }
-</style></head><body><div class="box">CT</div></body></html>`;
+const iconHtml = (size) => `<!doctype html><html><head><meta charset="utf-8" /><style>
+  * { margin: 0; padding: 0; }
+  html, body { width: ${size}px; height: ${size}px; background: #0c4a34; }
+  svg { display: block; }
+</style></head><body>${mark(size).replace('rx="128"', 'rx="0"')}</body></html>`;
 
 const browser = await chromium.launch();
 try {
-  const og = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
+  const og = await browser.newPage({
+    viewport: { width: 1200, height: 630 },
+    deviceScaleFactor: 1,
+  });
   await og.setContent(ogHtml, { waitUntil: 'networkidle' });
   await og.evaluate(() => document.fonts.ready);
-  await og.waitForTimeout(200);
   await og.screenshot({ path: resolve(PUBLIC, 'og-image.png'), type: 'png' });
   await og.close();
   process.stdout.write('✓ public/og-image.png (1200x630)\n');
 
-  const icon = await browser.newPage({ viewport: { width: 180, height: 180 }, deviceScaleFactor: 1 });
-  await icon.setContent(iconHtml, { waitUntil: 'networkidle' });
-  await icon.evaluate(() => document.fonts.ready);
-  await icon.waitForTimeout(200);
-  await icon.screenshot({ path: resolve(PUBLIC, 'apple-touch-icon.png'), type: 'png' });
-  await icon.close();
-  process.stdout.write('✓ public/apple-touch-icon.png (180x180)\n');
+  // iOS rounds the corners itself, so the touch icon is full-bleed.
+  for (const [file, size] of [
+    ['apple-touch-icon.png', 180],
+    ['favicon-192x192.png', 192],
+  ]) {
+    const icon = await browser.newPage({ viewport: { width: size, height: size } });
+    await icon.setContent(iconHtml(size), { waitUntil: 'load' });
+    await icon.screenshot({ path: resolve(PUBLIC, file), type: 'png' });
+    await icon.close();
+    process.stdout.write(`✓ public/${file} (${size}x${size})\n`);
+  }
 } finally {
   await browser.close();
 }

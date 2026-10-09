@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test';
 
+import { clickNavLink } from './helpers';
+
 test.describe('Contact Form', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('');
-    // Navigate to contact section
-    await page.click('nav a[href*="#contact"]');
-    await page.waitForTimeout(500);
+    // Navigate to contact section (opens the mobile drawer first if needed)
+    await clickNavLink(page, 'nav a[href*="#contact"]');
   });
 
   test('should display contact form', async ({ page }) => {

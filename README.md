@@ -28,16 +28,33 @@ A modern, responsive portfolio website built with [Astro](https://astro.build) -
 
 ### Sections
 
-- **Hero** - 3D particle background with interactive morphing geometry
-- **About** - Biography with animated skills showcase
-- **Stats** - Key metrics and achievements display
-- **Projects** - Featured work with technology tags, live demos, and GitHub links
-- **Experience** - Professional timeline with role achievements
-- **Certifications** - Professional credentials and courses
-- **Testimonials** - Client and colleague recommendations
+- **Hero** - Full-screen: oversized name beside a 3D particle Golden Arrowhead (the site mark), with a bento strip for the current role (from the experiences collection), live local time in Guyana, and key figures
+- **Projects** - Bento grid of featured work, ordered by `order`; cards tilt in 3D, open a cover preview on hover, and morph into a detail page at `/projects/<slug>/`
+- **About** - Biography and toolkit grouped by category
+- **Experience** - Reverse-chronological timeline with role achievements
+- **Certifications** - Education and professional credentials
+- **Testimonials** - Colleague and client recommendations
 - **Contact** - Validated form with real-time feedback and toast notifications
 - **Footer** - Social links and attribution
-- **Scroll-to-top** - Animated button for quick navigation
+- **Scroll-to-top** - Button for quick navigation
+- **Background** - Site-wide three.js constellation, recolored per theme
+
+### Motion and 3D
+
+All motion lives in [src/scripts/motion/](src/scripts/motion/) and runs on every `astro:page-load`:
+
+- **Intro** (`intro.ts`, `Loader.astro`) — a short loader on the first home-page visit per session, then the hero entrance. Skipped when deep-linking to a section.
+- **Smooth scrolling** (`smooth-scroll.ts`) — Lenis on the GSAP ticker. Touch devices keep native scrolling. Programmatic scrolls go through `scroll-to.ts`.
+- **Reveals** (`reveals.ts`, `split.ts`) — add `data-reveal="title" | "fade" | "stagger"` to an element. Only opacity and transform animate, so unrevealed content stays available to screen readers.
+- **Cursor and magnets** (`cursor.ts`, `Cursor.astro`) — fine pointers only. `data-magnetic` makes an element lean toward the pointer; `data-cursor="view"` shows the "View" cursor.
+- **Card tilt** (`tilt.ts`) — `data-tilt` inside a `.tilt-stage`.
+- **3D scene** ([src/scripts/three/](src/scripts/three/)) — one renderer for the constellation and the hero arrowhead (`arrowhead.ts`). GSAP ScrollTrigger scrubs `sceneState.heroProgress` ([src/scripts/scene-state.ts](src/scripts/scene-state.ts)) to scatter the mark as the hero scrolls away. Pixel ratio is capped at 2 (1.5 on phones), rendering pauses while the tab is hidden, and phones get fewer particles. Set `localStorage.disableThree = '1'` to turn the scene off.
+
+With `prefers-reduced-motion: reduce`, none of this animates: no loader, native scrolling and cursor, content visible immediately, and the 3D scene renders still frames.
+
+### Design system
+
+Tokens live in one place: CSS variables in [src/styles/global.css](src/styles/global.css) (the Tailwind CSS v4 entry, which loads the JS config via `@config`), exposed to Tailwind as `canvas`, `surface`, `sunken`, `ink`, `muted`, `line`, `link`, `gold` and `forest` (see [tailwind.config.mjs](tailwind.config.mjs)), so one class works in light and dark mode. The palette takes the forest green and gold of Guyana's Golden Arrowhead. Type is Archivo throughout; `font-display` stretches it to its widest cut for the name and `font-heading` sets section headings. Sections use the `page-width` utility for the shared measure (not `container`, which Tailwind v4 reserves). Tiles (`.tile` plus `.tile-surface`, `.tile-sunken`, `.tile-forest` or `.tile-gold`) build the bento layouts. Run `npm run generate:images` after brand changes to re-render the OG image and PNG icons.
 
 ## 📁 Project Structure
 
@@ -60,7 +77,6 @@ portfolio-site/
 │   │   ├── Header.astro
 │   │   ├── Hero.astro
 │   │   ├── About.astro
-│   │   ├── Stats.astro
 │   │   ├── Projects.astro
 │   │   ├── ProjectCard.astro
 │   │   ├── Experience.astro
@@ -69,7 +85,6 @@ portfolio-site/
 │   │   ├── Contact.astro
 │   │   ├── Footer.astro
 │   │   ├── ScrollToTop.astro
-│   │   ├── SectionDivider.astro
 │   │   └── Toast.astro
 │   ├── content/                # Astro content collections (typed JSON)
 │   │   ├── config.ts           # Collection schemas (Zod)
@@ -80,6 +95,8 @@ portfolio-site/
 │   │   └── testimonials/*.json
 │   ├── layouts/
 │   │   └── Layout.astro       # Main page layout
+│   ├── styles/
+│   │   └── global.css         # Tailwind v4 entry, design tokens, global styles
 │   ├── pages/
 │   │   ├── index.astro        # Homepage
 │   │   └── 404.astro          # Error page
@@ -157,36 +174,30 @@ npm run dev
 ### Personal Information
 
 1. **Hero Section** - Edit [src/components/Hero.astro](src/components/Hero.astro):
-   - Change your name and tagline
-   - Update the description text
-   - Customize call-to-action buttons
+   - Change the tagline, call-to-action buttons and the key figures (`figures`)
+   - The "since" tile reads the current role from the experiences collection
 
-2. **About Section** - Edit [src/components/About.astro](src/components/About.astro) and [src/data/skills.json](src/data/skills.json):
+2. **About Section** - Edit [src/components/About.astro](src/components/About.astro) and `src/content/skills/*.json`:
    - Update biography text
-   - Add/modify skills in `skills.json`
+   - Add/modify skill categories in the JSON files
 
-3. **Stats** - Edit [src/components/Stats.astro](src/components/Stats.astro):
-   - Update metrics (years of experience, projects completed, etc.)
+3. **Projects** - Edit `src/content/projects/*.json` (each file also becomes a page at `/projects/<file-name>/`):
+   - Titles, descriptions, technologies and links; optional `client`, `outcome` (set large on the cover), `order` (display position) and `cover` (a screenshot path under `public/`, e.g. `"/projects/erp.webp"`; without one a generated cover is shown)
 
-4. **Projects** - Edit [src/data/projects.json](src/data/projects.json):
-   - Add your projects with titles, descriptions, technologies, images, and links
-   - Projects are automatically rendered from this JSON file
+4. **Experience** - Edit `src/content/experiences/*.json`:
+   - Job titles, companies, periods and achievements; set `order` so the newest role comes first
 
-5. **Experience** - Edit [src/data/experiences.json](src/data/experiences.json):
-   - Add your work history with job titles, companies, periods, and achievements
-   - Timeline is auto-generated from the JSON data
+5. **Certifications** - Edit `src/content/certifications/*.json`:
+   - Professional certifications and degrees; `order` controls position (the first gets the gold tile)
 
-6. **Certifications** - Edit [src/data/certifications.json](src/data/certifications.json):
-   - Add your professional certifications and credentials
+6. **Testimonials** - Edit `src/content/testimonials/*.json`:
+   - Recommendations with names and roles
 
-7. **Testimonials** - Edit [src/data/testimonials.json](src/data/testimonials.json):
-   - Add client/colleague recommendations with names, roles, and companies
-
-8. **Contact & Footer** - Edit [src/components/Contact.astro](src/components/Contact.astro) and [src/components/Footer.astro](src/components/Footer.astro):
+7. **Contact & Footer** - Edit [src/components/Contact.astro](src/components/Contact.astro) and [src/components/Footer.astro](src/components/Footer.astro):
    - Update email addresses
    - Add your GitHub, LinkedIn, Twitter, and other social media links
 
-9. **Site Metadata** - Edit [astro.config.mjs](astro.config.mjs):
+8. **Site Metadata** - Edit [astro.config.mjs](astro.config.mjs):
    - Update the `site` field with your actual domain
    - Update the `base` path for your deployment
 

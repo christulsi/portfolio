@@ -1,6 +1,8 @@
 import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from '@playwright/test';
 
+import { clickNavLink, settleAnimations } from './helpers';
+
 test.describe('Accessibility', () => {
   test('should not have any automatically detectable accessibility issues', async ({ page }) => {
     await page.goto('');
@@ -8,6 +10,7 @@ test.describe('Accessibility', () => {
     // Wait for page to fully load
     await page.waitForLoadState('networkidle');
 
+    await settleAnimations(page);
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
       .analyze();
@@ -44,8 +47,7 @@ test.describe('Accessibility', () => {
 
   test('should have proper form labels', async ({ page }) => {
     await page.goto('');
-    await page.click('nav a[href*="#contact"]');
-    await page.waitForTimeout(300);
+    await clickNavLink(page, 'nav a[href*="#contact"]');
 
     // Check name input
     const nameLabel = page.locator('label[for="name"]');
@@ -101,6 +103,7 @@ test.describe('Accessibility', () => {
   test('should have sufficient color contrast', async ({ page }) => {
     await page.goto('');
 
+    await settleAnimations(page);
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2aa'])
       .include('body')
@@ -117,6 +120,7 @@ test.describe('Accessibility', () => {
   test('should not have any critical ARIA violations', async ({ page }) => {
     await page.goto('');
 
+    await settleAnimations(page);
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
       .analyze();

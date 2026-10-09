@@ -70,3 +70,6 @@ Thumbs.db
 
 # Optional stylelint cache
 .stylelintcache
+
+# Bundle treemap from `npm run analyze`
+bundle-stats.html
