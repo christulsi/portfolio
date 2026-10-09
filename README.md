@@ -28,8 +28,8 @@ A modern, responsive portfolio website built with [Astro](https://astro.build) -
 
 ### Sections
 
-- **Hero** - Bento grid: oversized name, current role (from the experiences collection), live local time in Guyana, and key figures
-- **Projects** - Bento grid of featured work, ordered by `order`, with client and headline outcome
+- **Hero** - Full-screen: oversized name beside a 3D particle Golden Arrowhead (the site mark), with a bento strip for the current role (from the experiences collection), live local time in Guyana, and key figures
+- **Projects** - Bento grid of featured work, ordered by `order`; cards tilt in 3D, open a cover preview on hover, and morph into a detail page at `/projects/<slug>/`
 - **About** - Biography and toolkit grouped by category
 - **Experience** - Reverse-chronological timeline with role achievements
 - **Certifications** - Education and professional credentials
@@ -38,6 +38,19 @@ A modern, responsive portfolio website built with [Astro](https://astro.build) -
 - **Footer** - Social links and attribution
 - **Scroll-to-top** - Button for quick navigation
 - **Background** - Site-wide three.js constellation, recolored per theme
+
+### Motion and 3D
+
+All motion lives in [src/scripts/motion/](src/scripts/motion/) and runs on every `astro:page-load`:
+
+- **Intro** (`intro.ts`, `Loader.astro`) — a short loader on the first home-page visit per session, then the hero entrance. Skipped when deep-linking to a section.
+- **Smooth scrolling** (`smooth-scroll.ts`) — Lenis on the GSAP ticker. Touch devices keep native scrolling. Programmatic scrolls go through `scroll-to.ts`.
+- **Reveals** (`reveals.ts`, `split.ts`) — add `data-reveal="title" | "fade" | "stagger"` to an element. Only opacity and transform animate, so unrevealed content stays available to screen readers.
+- **Cursor and magnets** (`cursor.ts`, `Cursor.astro`) — fine pointers only. `data-magnetic` makes an element lean toward the pointer; `data-cursor="view"` shows the "View" cursor.
+- **Card tilt** (`tilt.ts`) — `data-tilt` inside a `.tilt-stage`.
+- **3D scene** ([src/scripts/three/](src/scripts/three/)) — one renderer for the constellation and the hero arrowhead (`arrowhead.ts`). GSAP ScrollTrigger scrubs `sceneState.heroProgress` ([src/scripts/scene-state.ts](src/scripts/scene-state.ts)) to scatter the mark as the hero scrolls away. Pixel ratio is capped at 2 (1.5 on phones), rendering pauses while the tab is hidden, and phones get fewer particles. Set `localStorage.disableThree = '1'` to turn the scene off.
+
+With `prefers-reduced-motion: reduce`, none of this animates: no loader, native scrolling and cursor, content visible immediately, and the 3D scene renders still frames.
 
 ### Design system
 
@@ -166,8 +179,8 @@ npm run dev
    - Update biography text
    - Add/modify skill categories in the JSON files
 
-3. **Projects** - Edit `src/content/projects/*.json`:
-   - Titles, descriptions, technologies and links; optional `client`, `outcome` (shown as a gold pill) and `order` (display position)
+3. **Projects** - Edit `src/content/projects/*.json` (each file also becomes a page at `/projects/<file-name>/`):
+   - Titles, descriptions, technologies and links; optional `client`, `outcome` (set large on the cover), `order` (display position) and `cover` (a screenshot path under `public/`, e.g. `"/projects/erp.webp"`; without one a generated cover is shown)
 
 4. **Experience** - Edit `src/content/experiences/*.json`:
    - Job titles, companies, periods and achievements; set `order` so the newest role comes first
