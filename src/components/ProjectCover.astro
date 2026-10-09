@@ -1,0 +1,136 @@
+---
+// NEW: Project preview. Uses the project's `cover` image when one is set;
+// otherwise draws a generated cover: a field of arrowheads (the site mark) in
+// the palette, seeded from the slug so each project gets its own stable
+// pattern, with the headline outcome set large when the project has one.
+// On card hover the cover's inset mask opens and the field drifts toward the
+// tip (CSS transitions in this file; card tilt is in motion/tilt.ts).
+import { seededRandom, splitOutcome } from '../utils/content';
+
+interface Props {
+  slug: string;
+  title: string;
+  outcome?: string;
+  cover?: string;
+  /** Darker field when the card itself is forest, so the cover still separates. */
+  onForest?: boolean;
+  size?: 'card' | 'page';
+  class?: string;
+}
+
+const {
+  slug,
+  title,
+  outcome,
+  cover,
+  onForest = false,
+  size = 'card',
+  class: className,
+} = Astro.props;
+const base = (import.meta.env.BASE_URL ?? '/').replace(/\/+$/, '');
+
+const rand = seededRandom(slug);
+// Same cell size at both sizes; the page cover just shows more of the field.
+const COLS = size === 'page' ? 18 : 9;
+const ROWS = size === 'page' ? 7 : 5;
+const CELL = 40;
+const cells: Array<{ x: number; y: number; kind: 'fill' | 'line' }> = [];
+for (let row = 0; row < ROWS; row++) {
+  for (let col = 0; col < COLS; col++) {
+    const r = rand();
+    // Denser toward the right (the direction the arrowheads point).
+    const bias = col / COLS;
+    if (r < 0.1 + bias * 0.22) cells.push({ x: col * CELL, y: row * CELL, kind: 'fill' });
+    else if (r < 0.38 + bias * 0.2) cells.push({ x: col * CELL, y: row * CELL, kind: 'line' });
+  }
+}
+const arrow = (x: number, y: number) =>
+  `M${x + 11} ${y + 9}L${x + 31} ${y + 20}L${x + 11} ${y + 31}Z`;
+const figure = outcome ? splitOutcome(outcome) : null;
+---
+
+<div
+  class:list={[
+    'project-cover relative overflow-hidden',
+    size === 'page' ? 'cover-open aspect-[16/7] rounded-tile' : 'aspect-[16/8] rounded-[1.25rem]',
+    onForest ? 'bg-[#093a29]' : 'bg-forest',
+    className,
+  ]}
+  transition:name={`project-cover-${slug}`}
+>
+  {cover ? (
+    <img
+      src={`${base}${cover}`}
+      alt={`Preview of ${title}`}
+      class="cover-art h-full w-full object-cover"
+      loading="lazy"
+      decoding="async"
+    />
+  ) : (
+    <svg
+      viewBox={`0 0 ${COLS * CELL} ${ROWS * CELL}`}
+      preserveAspectRatio="xMidYMid slice"
+      class="cover-art h-full w-full"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {cells.map((cell) =>
+        cell.kind === 'fill' ? (
+          <path d={arrow(cell.x, cell.y)} fill="#f4c430" />
+        ) : (
+          <path
+            d={arrow(cell.x, cell.y)}
+            fill="none"
+            stroke="#ecf5ef"
+            stroke-opacity="0.35"
+            stroke-width="1.2"
+            stroke-linejoin="round"
+          />
+        )
+      )}
+    </svg>
+  )}
+  {figure && (
+    <p class="cover-figure absolute bottom-0 left-0 flex items-end gap-3 p-5 text-on-forest md:p-6">
+      <span class="font-display text-5xl leading-none text-gold md:text-6xl">{figure.figure}</span>
+      <span class="max-w-[9rem] pb-1 text-sm leading-tight">{figure.rest}</span>
+    </p>
+  )}
+</div>
+
+<style>
+  .project-cover {
+    /* The inset mask opens on hover — the "preview reveal". */
+    clip-path: inset(5% 4% 5% 4% round 1.25rem);
+    transition: clip-path 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .cover-art {
+    transform: scale(1.06) translateX(-2%);
+    transition: transform 1s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  :global(.project-card:hover) .project-cover,
+  :global(.project-card:focus-within) .project-cover,
+  .project-cover.cover-open {
+    clip-path: inset(0 round 1.25rem);
+  }
+
+  :global(.project-card:hover) .cover-art,
+  :global(.project-card:focus-within) .cover-art {
+    transform: scale(1) translateX(2%);
+  }
+
+  .cover-figure {
+    /* Keep the figure legible over the pattern. */
+    background: linear-gradient(to top, rgb(9 58 41 / 0.92), rgb(9 58 41 / 0));
+    width: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .project-cover,
+    .cover-art {
+      transition: none;
+    }
+  }
+</style>

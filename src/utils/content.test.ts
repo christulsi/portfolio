@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { findCurrent, periodStart, sortByOrder } from './content';
+import {
+  findCurrent,
+  periodStart,
+  projectPath,
+  seededRandom,
+  sortByOrder,
+  splitOutcome,
+} from './content';
 
 describe('sortByOrder', () => {
   it('sorts ascending by order', () => {
@@ -64,5 +71,49 @@ describe('periodStart', () => {
 
   it('returns the whole string when there is no range', () => {
     expect(periodStart('2023')).toBe('2023');
+  });
+});
+
+describe('projectPath', () => {
+  it('joins base and slug with a trailing slash', () => {
+    expect(projectPath('/portfolio', 'erp')).toBe('/portfolio/projects/erp/');
+  });
+
+  it('tolerates a trailing slash on the base', () => {
+    expect(projectPath('/portfolio/', 'erp')).toBe('/portfolio/projects/erp/');
+    expect(projectPath('/', 'erp')).toBe('/projects/erp/');
+  });
+});
+
+describe('splitOutcome', () => {
+  it('separates the figure from the description', () => {
+    expect(splitOutcome('40% faster processing')).toEqual({
+      figure: '40%',
+      rest: 'faster processing',
+    });
+  });
+
+  it('handles multipliers and decimals', () => {
+    expect(splitOutcome('2.5x more throughput')?.figure).toBe('2.5x');
+  });
+
+  it('returns null when there is no leading figure', () => {
+    expect(splitOutcome('Faster processing')).toBeNull();
+  });
+});
+
+describe('seededRandom', () => {
+  it('is deterministic per key', () => {
+    const a = seededRandom('erp');
+    const b = seededRandom('erp');
+    expect([a(), a(), a()]).toEqual([b(), b(), b()]);
+  });
+
+  it('differs between keys and stays within 0..1', () => {
+    const a = seededRandom('erp')();
+    const b = seededRandom('cicd')();
+    expect(a).not.toBe(b);
+    expect(a).toBeGreaterThanOrEqual(0);
+    expect(a).toBeLessThan(1);
   });
 });

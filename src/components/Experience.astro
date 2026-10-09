@@ -8,14 +8,14 @@ const experiences = sortByOrder((await getCollection('experiences')).map((entry)
 
 <section id="experience" class="section container" aria-labelledby="experience-title">
   <div class="section-head">
-    <h2 id="experience-title" class="section-title">
+    <h2 id="experience-title" class="section-title" data-reveal="title">
       Experience
     </h2>
   </div>
 
   <!-- A real sequence, so it gets a timeline rule: open on the canvas rather
        than boxed in a tile. -->
-  <ol class="border-t border-line">
+  <ol class="border-t border-line" data-reveal="stagger">
     {experiences.map((exp) => {
       const isCurrent = /present/i.test(exp.period);
       return (

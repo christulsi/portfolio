@@ -7,13 +7,16 @@ const testimonials = testimonialEntries.map((entry) => entry.data);
 
 <section class="section container" aria-labelledby="testimonials-title">
   <div class="section-head">
-    <h2 id="testimonials-title" class="section-title">
+    <h2 id="testimonials-title" class="section-title" data-reveal="title">
       From the people I work with
     </h2>
   </div>
 
   <!-- Quotes sit on the canvas, separated by rules rather than boxed in cards. -->
-  <div class="grid gap-10 border-t border-line pt-8 md:grid-cols-3 md:gap-0 md:divide-x md:divide-line">
+  <div
+    class="grid gap-10 border-t border-line pt-8 md:grid-cols-3 md:gap-0 md:divide-x md:divide-line"
+    data-reveal="stagger"
+  >
     {testimonials.map((testimonial) => (
       <figure class="flex flex-col justify-between gap-6 md:px-8 md:first:pl-0 md:last:pr-0">
         <blockquote class="text-lg leading-relaxed md:text-xl">

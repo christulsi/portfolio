@@ -28,6 +28,9 @@ export const ProjectSchema = z.object({
   githubUrl: z.string().url('Invalid URL').optional(),
   // Who the work was for, and its headline result, shown on the project tile.
   client: z.string().min(1).optional(),
+  // NEW: optional screenshot/preview path under public/ (e.g. "/projects/erp.webp").
+  // Without one, the card shows a generated cover in the site palette.
+  cover: z.string().min(1).optional(),
   outcome: z.string().min(1).optional(),
   order: z.number().int().optional(),
 });

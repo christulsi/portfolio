@@ -1,7 +1,11 @@
 ---
 import { SEO } from 'astro-seo';
 import { ClientRouter } from 'astro:transitions';
+// NEW: Lenis base styles (html height, stopped state).
+import 'lenis/dist/lenis.css';
 
+import Cursor from '../components/Cursor.astro';
+import Loader from '../components/Loader.astro';
 import Toast from '../components/Toast.astro';
 import { personJsonLd } from '../data/structured-data';
 
@@ -10,6 +14,8 @@ interface Props {
   description?: string;
   image?: string;
   type?: string;
+  /** NEW: page has the intro loader + hero entrance (home page). */
+  intro?: boolean;
 }
 
 const {
@@ -17,6 +23,7 @@ const {
   description = 'Senior ICT Engineer specializing in ERP, data engineering, and AI/ML solutions. Building scalable software for government and enterprise.',
   image = '/og-image.png',
   type = 'website',
+  intro = false,
 } = Astro.props;
 
 const base = import.meta.env.BASE_URL.endsWith('/')
@@ -27,7 +34,7 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-has-intro={intro ? '' : undefined}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -95,33 +102,69 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
     <!-- Structured Data (JSON-LD) for SEO -->
     <script is:inline type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
     <!-- Archivo (variable width + weight). Preloaded and applied without
-         blocking render; the expanded width drives the display type. -->
+         blocking render; the expanded width drives the display type.
+         NEW: width range starts at 75 so the hero name can widen into place. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&display=swap"
       as="style"
       onload="this.onload=null;this.rel='stylesheet'"
     />
     <noscript>
       <link
-        href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&display=swap"
         rel="stylesheet"
       />
     </noscript>
     <script is:inline>
-      // Dark mode initialization (runs before page render to prevent flash)
-      // Priority: localStorage > system preference > light fallback
+      // Runs before first paint, once per full page load.
       (() => {
-        const stored = localStorage.getItem('theme');
-        if (stored === 'light' || stored === 'dark') {
-          document.documentElement.setAttribute('data-theme', stored);
-          return;
+        const root = document.documentElement;
+
+        // Dark mode: localStorage > system preference > light fallback.
+        let stored = null;
+        try {
+          stored = localStorage.getItem('theme');
+        } catch {
+          /* storage blocked */
         }
         const prefersDark =
           window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+        root.setAttribute(
+          'data-theme',
+          stored === 'light' || stored === 'dark' ? stored : prefersDark ? 'dark' : 'light'
+        );
+
+        // NEW: motion. `motion` gates every hidden-until-animated state in CSS,
+        // so reduced motion and no-JS always render the finished page.
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          root.classList.add('motion');
+          // The intro loader plays once per session, on the home page, and not
+          // when the visitor deep-links to a section.
+          if (root.hasAttribute('data-has-intro') && !location.hash) {
+            try {
+              if (sessionStorage.getItem('intro-seen') !== '1') {
+                sessionStorage.setItem('intro-seen', '1');
+                root.classList.add('is-loading');
+              }
+            } catch {
+              /* storage blocked: skip the loader */
+            }
+          }
+        }
+
+        // NEW: client-side navigation replaces <html>'s attributes with the
+        // next page's server-rendered ones. Carry runtime state across: the
+        // theme, and classes like `motion`, `intro-done`, `has-cursor`, `lenis`.
+        document.addEventListener('astro:before-swap', (ev) => {
+          const next = ev.newDocument.documentElement;
+          next.setAttribute('data-theme', root.getAttribute('data-theme') || 'light');
+          root.classList.forEach((name) => {
+            if (name !== 'is-loading' && name !== 'intro-running') next.classList.add(name);
+          });
+        });
       })();
     </script>
   </head>
@@ -129,18 +172,28 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
     <!-- Site-wide constellation background: fixed, behind all content, and
          persisted across client-side navigations so it animates uninterrupted. -->
     <div id="three-root" transition:persist aria-hidden="true"></div>
+    <!-- NEW: intro loader (home only) and custom cursor (fine pointers only). -->
+    {intro && <Loader />}
+    <Cursor />
     <a href="#main" class="skip-link">
       Skip to main content
     </a>
     <Toast />
     <slot />
     <script>
+      // NEW: the motion layer — Lenis, GSAP reveals, cursor, intro, 3D scroll.
+      import '../scripts/motion/index';
+      import { scrollToTarget } from '../scripts/motion/scroll-to';
+
       // Re-runs on every client-side navigation via ClientRouter, in addition to
       // the initial page load. DOMContentLoaded would only fire once.
       function scrollToHash() {
         const id = location.hash.replace(/^#/, '');
         if (id) {
-          setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 50);
+          setTimeout(() => {
+            const target = document.getElementById(id);
+            if (target) scrollToTarget(target);
+          }, 50);
         }
       }
 
@@ -148,19 +201,26 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
       document.addEventListener('astro:page-load', scrollToHash);
     </script>
     <script>
-      // Lazy-load the constellation background only when the device can handle
-      // it. Keeps the three.js chunk out of the critical path and off small /
-      // data-saver devices. The #three-root element persists across navigations
-      // and the module guards against double-init, so re-importing on each
-      // page-load is effectively free.
+      // Lazy-load the 3D scene (constellation + hero arrowhead). Keeps the
+      // three.js chunk out of the critical path and off data-saver devices.
+      // The #three-root element persists across navigations and the module
+      // guards against double-init, so re-importing on each page-load is
+      // effectively free.
       function maybeLoadThree() {
         try {
           if (localStorage.getItem('disableThree') === '1') return;
           const conn = (navigator as Navigator & { connection?: { saveData?: boolean } })
             .connection;
           if (conn?.saveData) return;
-          if (window.innerWidth < 640) return;
-          void import('../scripts/three/index.ts');
+          const load = () => void import('../scripts/three/index.ts');
+          // NEW: phones get a lighter scene (it used to be skipped below 640px),
+          // loaded once the main thread is idle so it never competes with first
+          // paint.
+          if (window.innerWidth < 768 && 'requestIdleCallback' in window) {
+            window.requestIdleCallback(load, { timeout: 2500 });
+          } else {
+            load();
+          }
         } catch (err) {
           console.error('Failed to load constellation background:', err);
         }
@@ -212,8 +272,17 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
       -webkit-text-size-adjust: 100%;
     }
 
+    /* NEW: Lenis drives the scroll position itself; native smoothing would
+       fight every frame it sets. */
+    html.lenis {
+      scroll-behavior: auto;
+    }
+
+    /* NEW: 17px body on a 1.65 rhythm — a touch larger and airier. */
     body {
-      @apply bg-canvas text-ink font-sans leading-relaxed antialiased;
+      @apply bg-canvas text-ink font-sans antialiased;
+      font-size: 1.0625rem;
+      line-height: 1.65;
     }
 
     h1,
@@ -222,6 +291,12 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
     h4 {
       @apply leading-tight;
       text-wrap: balance;
+    }
+
+    p,
+    li,
+    blockquote {
+      text-wrap: pretty;
     }
 
     a {
@@ -244,17 +319,12 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
   }
 
   @layer components {
+    /* NEW: wider measure for the grid, fluid gutters. */
     .container {
       width: 100%;
-      max-width: 76rem;
+      max-width: 84rem;
       margin-inline: auto;
-      padding-inline: 1.25rem;
-    }
-
-    @media (min-width: 768px) {
-      .container {
-        padding-inline: 2rem;
-      }
+      padding-inline: clamp(1.25rem, 4vw, 3.5rem);
     }
 
     /* Two-step type scale on Archivo's width axis. The widest, heaviest cut is
@@ -272,22 +342,30 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
       letter-spacing: -0.02em;
     }
 
+    /* NEW: more air between sections and a bigger, tighter heading scale. */
     .section {
-      @apply py-12 md:py-16;
+      padding-block: clamp(5rem, 11vw, 9rem);
     }
 
     .section-head {
-      @apply mb-8 flex flex-col gap-3 md:mb-10 md:flex-row md:items-end md:justify-between md:gap-12;
+      @apply mb-10 flex flex-col gap-4 md:mb-16 md:flex-row md:items-end md:justify-between md:gap-12;
     }
 
     .section-title {
       @apply font-heading;
-      font-size: clamp(2rem, 4.2vw, 3.25rem);
-      line-height: 1.02;
+      font-size: clamp(2.6rem, 6.2vw, 5.5rem);
+      line-height: 0.96;
+      letter-spacing: -0.035em;
     }
 
     .section-intro {
-      @apply max-w-md text-muted md:text-right;
+      @apply max-w-md text-lg text-muted md:text-right;
+    }
+
+    /* NEW: lead paragraph size, shared by the hero and project pages. */
+    .lede {
+      font-size: clamp(1.15rem, 1.5vw, 1.375rem);
+      line-height: 1.5;
     }
 
     /* Bento tiles. Treatments vary by role rather than one card style everywhere. */
@@ -340,21 +418,61 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
       pointer-events: none;
     }
 
-    /* The constellation is the hero's backdrop. Dim it over the first screen of
-       scrolling so it never competes with body text in the open reading
-       sections. Scroll-driven where supported; elsewhere it stays as is. */
-    @supports (animation-timeline: scroll()) {
-      #three-root {
-        animation: constellation-dim linear both;
-        animation-timeline: scroll(root block);
-        animation-range: 0 100vh;
-      }
+    /* NEW: Masked words for staggered heading reveals (motion/split.ts). The
+       padding/negative-margin pair keeps ascenders and descenders unclipped
+       without changing the line box. */
+    .split-word {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: top;
+      padding-block: 0.12em 0.14em;
+      margin-block: -0.12em -0.14em;
+    }
 
-      @keyframes constellation-dim {
-        to {
-          opacity: 0.3;
-        }
+    .split-inner {
+      display: inline-block;
+    }
+
+    /* NEW: Intro states. Hidden only while JS-driven motion is allowed and the
+       intro hasn't finished; the failsafe reveals everything if the motion
+       script never starts. */
+    html.motion:not(.intro-done) [data-intro-item] {
+      opacity: 0;
+    }
+
+    html.motion:not(.intro-done) .hero-line > span {
+      transform: translateY(105%);
+    }
+
+    html.motion:not(.intro-done):not(.intro-running) :is([data-intro-item], .hero-line > span) {
+      animation: intro-failsafe 0.6s ease-out 4s forwards;
+    }
+
+    @keyframes intro-failsafe {
+      to {
+        opacity: 1;
+        transform: none;
       }
+    }
+
+    /* NEW: 3D tilt cards (motion/tilt.ts) and their pointer-following sheen. */
+    .tilt-stage {
+      perspective: 1400px;
+    }
+
+    [data-tilt] {
+      transform-style: preserve-3d;
+    }
+
+    /* NEW: native cursor hidden while the custom one is active, except where
+       typing needs the caret. */
+    html.has-cursor,
+    html.has-cursor * {
+      cursor: none;
+    }
+
+    html.has-cursor :is(input, textarea, select, [contenteditable='true']) {
+      cursor: auto;
     }
 
     /* One orchestrated entrance, used by the hero tiles only. */
@@ -398,6 +516,19 @@ const imageURL = new URL(`${base}${image.replace(/^\//, '')}`, Astro.site);
 
     .rise {
       animation: none;
+    }
+  }
+
+  /* NEW: never print half-revealed content. */
+  @media print {
+    [data-reveal],
+    [data-reveal] > *,
+    .split-inner,
+    [data-intro-item],
+    .hero-line > span {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: none !important;
     }
   }
 </style>

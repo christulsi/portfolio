@@ -1,0 +1,83 @@
+---
+// NEW: Intro loader — the arrowhead mark draws itself while the counter tracks
+// real readiness (fonts, window load, 3D scene); then the panel slides away to
+// reveal the hero. Hidden unless the inline head script in Layout.astro adds
+// `html.is-loading` (first visit per session, motion allowed). Driven by
+// src/scripts/motion/intro.ts; decorative, so hidden from assistive tech and
+// never blocks pointer input.
+---
+
+<div id="loader" aria-hidden="true">
+  <svg viewBox="0 0 32 32" class="loader-mark" focusable="false">
+    <path
+      data-loader-path
+      d="M9 8.5 24.5 16 9 23.5Z"
+      pathLength="1"
+      fill="none"
+      stroke="#f4c430"
+      stroke-width="1.2"
+      stroke-linejoin="round"
+    ></path>
+  </svg>
+  <p class="loader-name font-display">Chris Tulsi</p>
+  <p class="loader-count">
+    <span data-loader-count>0</span>%
+  </p>
+</div>
+
+<style>
+  #loader {
+    display: none;
+  }
+
+  :global(html.is-loading) #loader {
+    position: fixed;
+    inset: 0;
+    z-index: 10002;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: 1fr auto;
+    padding: clamp(1.25rem, 4vw, 3.5rem);
+    background: #0c4a34;
+    color: #ecf5ef;
+    pointer-events: none;
+  }
+
+  /* Failsafe: if the intro script never runs, get out of the way. */
+  :global(html.is-loading:not(.intro-running)) #loader {
+    animation: loader-failsafe 0.5s ease 4s forwards;
+  }
+
+  @keyframes loader-failsafe {
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  .loader-mark {
+    grid-column: 1 / -1;
+    align-self: center;
+    justify-self: center;
+    width: clamp(7rem, 22vmin, 12rem);
+    height: auto;
+  }
+
+  .loader-mark path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  .loader-name {
+    align-self: end;
+    font-size: clamp(2.25rem, 7vw, 5rem);
+    line-height: 0.9;
+  }
+
+  .loader-count {
+    align-self: end;
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    font-variant-numeric: tabular-nums;
+    color: #f4c430;
+  }
+</style>

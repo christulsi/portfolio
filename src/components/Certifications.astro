@@ -10,12 +10,12 @@ const certifications = sortByOrder(
 
 <section id="certifications" class="section container" aria-labelledby="certifications-title">
   <div class="section-head">
-    <h2 id="certifications-title" class="section-title">
+    <h2 id="certifications-title" class="section-title" data-reveal="title">
       Education and certification
     </h2>
   </div>
 
-  <ul class="border-t border-line">
+  <ul class="border-t border-line" data-reveal="stagger">
     {certifications.map((cert) => {
       const earned = cert.date !== 'Completed' ? cert.date : undefined;
       return (

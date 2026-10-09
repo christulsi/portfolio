@@ -7,16 +7,16 @@ const categories = skillEntries.map((entry) => entry.data);
 
 <section id="about" class="section container" aria-labelledby="about-title">
   <div class="section-head">
-    <h2 id="about-title" class="section-title">
+    <h2 id="about-title" class="section-title" data-reveal="title">
       About
     </h2>
-    <p class="section-intro">
+    <p class="section-intro" data-reveal="fade">
       Working inside government IT since 2019, from writing the apps to keeping them running.
     </p>
   </div>
 
   <div class="grid gap-10 lg:grid-cols-12 lg:gap-4">
-    <div class="space-y-5 text-lg lg:col-span-7 lg:pr-8">
+    <div class="space-y-5 text-lg lg:col-span-7 lg:pr-8" data-reveal="stagger">
       <p class="text-xl leading-relaxed md:text-2xl md:leading-snug">
         I'm a Senior ICT Engineer at Guyana's National Data Management Authority, where I lead ICT
         infrastructure and technical support and deliver digital transformation projects for
@@ -34,7 +34,7 @@ const categories = skillEntries.map((entry) => entry.data);
       </p>
     </div>
 
-    <div class="tile tile-sunken lg:col-span-5">
+    <div class="tile tile-sunken lg:col-span-5" data-reveal="fade">
       <h3 class="mb-2 text-xl font-semibold">Toolkit</h3>
       <dl>
         {categories.map((category) => (

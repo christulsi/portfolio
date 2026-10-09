@@ -14,6 +14,7 @@ export interface Project {
   liveUrl?: string;
   githubUrl?: string;
   client?: string;
+  cover?: string;
   outcome?: string;
   order?: number;
 }

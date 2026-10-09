@@ -1,13 +1,7 @@
 import { PerspectiveCamera, Scene, WebGLRenderer } from 'three';
 
-import {
-  CAMERA_FAR,
-  CAMERA_FOV,
-  CAMERA_NEAR,
-  CAMERA_POSITION_Z,
-  MAX_PIXEL_RATIO,
-  MIN_HEIGHT,
-} from './constants';
+import { CAMERA_FAR, CAMERA_FOV, CAMERA_NEAR, CAMERA_POSITION_Z, MIN_HEIGHT } from './constants';
+import { isSmallViewport, pickPixelRatio } from './utils';
 
 /**
  * Create and configure the Three.js renderer.
@@ -15,11 +9,12 @@ import {
 export function createRenderer(root: HTMLElement): WebGLRenderer {
   const renderer = new WebGLRenderer({
     alpha: true,
-    antialias: true,
+    // NEW: skip MSAA on phones — the round point sprites are already soft.
+    antialias: !isSmallViewport(),
     powerPreference: 'low-power',
   });
 
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO));
+  renderer.setPixelRatio(pickPixelRatio());
   renderer.setSize(root.clientWidth, root.clientHeight || MIN_HEIGHT);
   // Fully transparent clear so the page background (and theme) shows through.
   renderer.setClearColor(0x000000, 0);
@@ -82,5 +77,7 @@ export function handleResize(
 
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
+  // NEW: re-evaluate the DPR cap (rotating a tablet can cross the 768px line).
+  renderer.setPixelRatio(pickPixelRatio());
   renderer.setSize(w, h);
 }

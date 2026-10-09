@@ -5,7 +5,10 @@ import { sortByOrder } from '../utils/content';
 
 import ProjectCard from './ProjectCard.astro';
 
-const projects = sortByOrder((await getCollection('projects')).map((entry) => entry.data));
+// NEW: keep each entry's id as its slug (detail-page URL).
+const projects = sortByOrder(
+  (await getCollection('projects')).map((entry) => ({ ...entry.data, slug: entry.id }))
+);
 
 // Alternating wide/narrow tiles give the grid a bento rhythm; the lead project
 // gets the forest treatment.
@@ -19,15 +22,16 @@ const layout = [
 
 <section id="projects" class="section container" aria-labelledby="projects-title">
   <div class="section-head">
-    <h2 id="projects-title" class="section-title">
+    <h2 id="projects-title" class="section-title" data-reveal="title">
       Selected work
     </h2>
-    <p class="section-intro">
+    <p class="section-intro" data-reveal="fade">
       Systems for government agencies in Guyana, and the tooling that keeps them shipping.
     </p>
   </div>
 
-  <div class="grid gap-3 md:gap-4 lg:grid-cols-12">
+  <!-- NEW: `tilt-stage` gives the cards perspective; `data-reveal` staggers them in. -->
+  <div class="tilt-stage grid gap-3 md:gap-4 lg:grid-cols-12" data-reveal="stagger">
     {projects.map((project, index) => {
       const slot = layout[index % layout.length] ?? layout[1];
       return <ProjectCard {...project} variant={slot.variant} class={slot.span} />;

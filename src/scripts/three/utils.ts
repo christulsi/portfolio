@@ -2,7 +2,7 @@
  * Utility functions for the constellation background.
  */
 
-import { MAX_NODE_COUNT } from './constants';
+import { MAX_NODE_COUNT, MAX_PIXEL_RATIO, MOBILE_PIXEL_RATIO } from './constants';
 
 /**
  * Get the current theme from the document.
@@ -44,7 +44,8 @@ export function shouldEnablePointer(): boolean {
  */
 export function pickNodeCount(): number {
   const w = window.innerWidth;
-  let count = w >= 1280 ? MAX_NODE_COUNT : w >= 900 ? 130 : 95;
+  // NEW: phones get a lighter field (the scene used to be skipped below 640px).
+  let count = w >= 1280 ? MAX_NODE_COUNT : w >= 900 ? 130 : w >= 640 ? 95 : 60;
 
   // navigator.deviceMemory is a non-standard but widely supported hint (GB).
   const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
@@ -53,6 +54,23 @@ export function pickNodeCount(): number {
   }
 
   return Math.min(count, MAX_NODE_COUNT);
+}
+
+/**
+ * NEW: Device pixel ratio for the renderer, capped at 2 (1.5 on phone-sized
+ * viewports, where the GPU budget is smaller and the canvas is full-screen).
+ */
+export function pickPixelRatio(): number {
+  const cap = window.innerWidth < 768 ? MOBILE_PIXEL_RATIO : MAX_PIXEL_RATIO;
+  return Math.min(window.devicePixelRatio || 1, cap);
+}
+
+/**
+ * NEW: Whether this is a phone-sized viewport (lighter scene: no antialiasing,
+ * fewer particles).
+ */
+export function isSmallViewport(): boolean {
+  return window.innerWidth < 768;
 }
 
 /**

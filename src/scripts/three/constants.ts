@@ -58,8 +58,10 @@ export const CAMERA_NEAR = 0.1;
 export const CAMERA_FAR = 1000;
 export const CAMERA_POSITION_Z = 70;
 
-// Renderer Settings — fixed full-viewport canvas, so keep DPR modest
-export const MAX_PIXEL_RATIO = 1.75;
+// Renderer Settings. NEW: DPR capped at 2 (1.5 on phones, see pickPixelRatio)
+// — sharper on retina screens without paying for 3x framebuffers.
+export const MAX_PIXEL_RATIO = 2;
+export const MOBILE_PIXEL_RATIO = 1.5;
 
 // Theme-aware Color Schemes, matched to the site palette (forest green and
 // gold). Light values are deeper so the network stays visible on the pale canvas.
@@ -78,6 +80,16 @@ export const COLOR_SCHEMES = {
 export const LINK_OPACITY = {
   light: 0.5,
   dark: 0.34,
+} as const;
+
+// NEW: Hero arrowhead. Upper bound for particles (desktop); `pickArrowheadCount`
+// scales it down per device. Colors are the mark's gold body and its border
+// band: forest on the pale light canvas, near-white on the dark one.
+export const MAX_ARROWHEAD_COUNT = 4200;
+export const ARROWHEAD_POINT_SIZE = 2.4;
+export const ARROWHEAD_COLORS = {
+  light: { body: 0xd19c0f, edge: 0x0c4a34 },
+  dark: { body: 0xf4c430, edge: 0xecf5ef },
 } as const;
 
 // Resize Defaults

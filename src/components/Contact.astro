@@ -27,10 +27,13 @@ const channels = [
 ---
 
 <section id="contact" class="section container" aria-labelledby="contact-title">
-  <div class="tile tile-forest grid gap-10 p-6 md:p-10 lg:grid-cols-12 lg:gap-12 lg:p-14">
+  <div
+    class="tile tile-forest grid gap-10 p-6 md:p-10 lg:grid-cols-12 lg:gap-12 lg:p-14"
+    data-reveal="fade"
+  >
     <div class="flex flex-col gap-8 lg:col-span-5">
       <div>
-        <h2 id="contact-title" class="section-title">
+        <h2 id="contact-title" class="section-title" data-reveal="title">
           Get in touch
         </h2>
         <p class="mt-5 max-w-md text-lg text-on-forest/85">
@@ -120,6 +123,7 @@ const channels = [
       <button
         type="submit"
         id="submit-btn"
+        data-magnetic
         class="btn btn-gold mt-6 w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
       >
         <span id="submit-text">Send message</span>

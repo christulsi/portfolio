@@ -1,5 +1,11 @@
 ---
+import { projectPath } from '../utils/content';
+
+import ProjectCover from './ProjectCover.astro';
+
 interface Props {
+  /** NEW: collection id; used for the detail-page URL and view-transition names. */
+  slug: string;
   title: string;
   description: string;
   technologies: string[];
@@ -7,28 +13,41 @@ interface Props {
   liveUrl?: string;
   client?: string;
   outcome?: string;
+  cover?: string;
   /** Tile treatment; the Projects grid alternates these for bento rhythm. */
   variant?: 'forest' | 'surface' | 'sunken';
   class?: string;
 }
 
 const {
+  slug,
   title,
   description,
   technologies,
   githubUrl,
   client,
   outcome,
+  cover,
   variant = 'surface',
   class: className,
 } = Astro.props;
 
 const onForest = variant === 'forest';
+const href = projectPath(import.meta.env.BASE_URL ?? '/', slug);
 ---
 
+<!--
+  NEW: the whole card links to the project page (the title link's ::after
+  covers the card), tilts toward the pointer (`data-tilt`, motion/tilt.ts),
+  shows the "View" cursor, and opens its cover on hover. The cover and title
+  carry view-transition names so they morph into the project page.
+-->
 <article
+  data-tilt
+  data-cursor="view"
+  data-cursor-label="View"
   class:list={[
-    'tile flex h-full flex-col gap-6',
+    'project-card tile group relative flex h-full flex-col gap-6',
     {
       'tile-forest': variant === 'forest',
       'tile-surface': variant === 'surface',
@@ -37,13 +56,24 @@ const onForest = variant === 'forest';
     className,
   ]}
 >
-  <div class="flex flex-wrap items-center justify-between gap-3 text-sm">
-    {client && <p class:list={[onForest ? 'text-on-forest/80' : 'text-muted']}>{client}</p>}
-    {outcome && <p class="rounded-full bg-gold px-3 py-1 font-semibold text-on-gold">{outcome}</p>}
-  </div>
+  <ProjectCover slug={slug} title={title} outcome={outcome} cover={cover} onForest={onForest} />
+
+  {client && (
+    <p class:list={['text-sm', onForest ? 'text-on-forest/80' : 'text-muted']}>{client}</p>
+  )}
 
   <div class="flex-grow">
-    <h3 class="font-heading text-[1.65rem] leading-[1.05] md:text-[2rem]">{title}</h3>
+    <h3
+      class="font-heading text-[1.65rem] leading-[1.05] md:text-[2rem]"
+      transition:name={`project-title-${slug}`}
+    >
+      <a
+        href={href}
+        class="text-current no-underline after:absolute after:inset-0 after:rounded-tile after:content-[''] hover:underline"
+      >
+        {title}
+      </a>
+    </h3>
     <p class:list={['mt-4 max-w-prose', onForest ? 'text-on-forest/85 md:text-lg' : 'text-muted']}>
       {description}
     </p>
@@ -62,9 +92,37 @@ const onForest = variant === 'forest';
       href={githubUrl}
       target="_blank"
       rel="noopener noreferrer"
-      class:list={['font-semibold underline', onForest && 'text-on-forest']}
+      class:list={['relative z-10 font-semibold underline', onForest && 'text-on-forest']}
     >
       View source on GitHub
     </a>
   )}
 </article>
+
+<style>
+  /* NEW: pointer-following sheen; position comes from motion/tilt.ts. It sits
+     between the card background and its content (isolate + z-index -1). */
+  .project-card {
+    isolation: isolate;
+  }
+
+  .project-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      circle at var(--px, 50%) var(--py, 0%),
+      rgb(255 255 255 / 0.16),
+      transparent 45%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .project-card:hover::before {
+    opacity: 1;
+  }
+</style>

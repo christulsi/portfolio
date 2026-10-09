@@ -20,6 +20,9 @@
 </button>
 
 <script>
+  // NEW: Lenis-aware scrolling (falls back to native smooth scrolling).
+  import { scrollToTarget } from '../scripts/motion/scroll-to';
+
   // Window-scoped state — listeners are attached once and persist across SPA navigations.
   let isVisible = false;
   let ticking = false;
@@ -51,8 +54,6 @@
   );
 
   document.addEventListener('astro:page-load', () => {
-    document
-      .getElementById('scroll-to-top')
-      ?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    document.getElementById('scroll-to-top')?.addEventListener('click', () => scrollToTarget(0));
   });
 </script>

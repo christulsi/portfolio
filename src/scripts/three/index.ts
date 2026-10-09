@@ -8,8 +8,11 @@
  * motion).
  */
 
-import { Group, LineSegments, Points } from 'three';
+import { Group, LineSegments, Points, Vector3 } from 'three';
 
+import { sceneState } from '../scene-state';
+
+import { createArrowhead, pickArrowheadCount } from './arrowhead';
 import {
   COLOR_LERP_SPEED,
   CURSOR_LINK_DISTANCE,
@@ -58,6 +61,7 @@ import {
   getCurrentTheme,
   isDataSaverEnabled,
   pickNodeCount,
+  pickPixelRatio,
   prefersReducedMotion,
   shouldEnablePointer,
 } from './utils';
@@ -118,6 +122,14 @@ export default function initThreeHero(): void {
   group.add(lines);
   group.add(points);
   scene.add(group);
+
+  // --- NEW: Hero centerpiece ----------------------------------------------
+  // The particle Golden Arrowhead. Lives outside the parallax group so its
+  // tilt and scroll scatter are independent of the background network.
+  const arrowhead = createArrowhead(pickArrowheadCount(), theme, pickPixelRatio());
+  arrowhead.setLayout(extents);
+  scene.add(arrowhead.points);
+  const pointerWorld = new Vector3();
 
   // --- State ---------------------------------------------------------------
   let rafId: number | null = null;
@@ -235,6 +247,20 @@ export default function initThreeHero(): void {
     lineBuffers.alphaAttr.needsUpdate = true;
   }
 
+  /** NEW: Advance the arrowhead from the shared scene state. */
+  function updateArrowhead(dt: number, elapsed: number): void {
+    const { active } = cursor;
+    if (active) pointerWorld.set(cursor.x + group.position.x, cursor.y + group.position.y, 0);
+    arrowhead.update(dt, elapsed, {
+      pointer: active ? pointerWorld : null,
+      ndcX: enablePointer ? interactionState.ndcX : 0,
+      ndcY: enablePointer ? interactionState.ndcY : 0,
+      hasHero: sceneState.hasHero,
+      heroProgress: sceneState.heroProgress,
+      assemble: sceneState.assemble,
+    });
+  }
+
   /** Push current colors + scroll intensity into the material uniforms. */
   function syncColors(elapsed: number): void {
     pointsUniforms.uColorA.value.copy(colorState.currentColorA);
@@ -280,6 +306,7 @@ export default function initThreeHero(): void {
     syncColors(now * 0.001);
 
     updateLinks();
+    updateArrowhead(dt, now * 0.001);
     render();
 
     rafId = requestAnimationFrame(animate);
@@ -294,6 +321,7 @@ export default function initThreeHero(): void {
     syncColors(0);
     pointsPositionAttr.needsUpdate = true;
     updateLinks();
+    updateArrowhead(0, 0);
     render();
   }
 
@@ -331,12 +359,15 @@ export default function initThreeHero(): void {
 
   const themeObserver = watchThemeChanges(colorState, () => {
     lineUniforms.uLineOpacity.value = LINK_OPACITY[getCurrentTheme()];
+    arrowhead.setTheme(getCurrentTheme());
     if (staticOnly) renderStaticFrame();
   });
 
   const onResize = (): void => {
     handleResize(root, camera, renderer);
     const ext = getVisibleHalfExtents(camera);
+    arrowhead.setLayout(ext);
+    arrowhead.setPixelRatio(renderer.getPixelRatio());
     field.bounds.x = ext.x * NODE_MARGIN;
     field.bounds.y = ext.y * NODE_MARGIN;
     const { positions, count, bounds } = field;
@@ -369,12 +400,20 @@ export default function initThreeHero(): void {
   };
   window.addEventListener('three:toggle', onToggle);
 
+  // NEW: a static scene redraws when the motion layer changes shared state
+  // (e.g. the hero leaving the viewport under reduced motion).
+  const onInvalidate = (): void => {
+    if (staticOnly) renderStaticFrame();
+  };
+  window.addEventListener('scene:invalidate', onInvalidate);
+
   // --- Cleanup -------------------------------------------------------------
   function dispose(): void {
     stop();
     window.removeEventListener('resize', onResize);
     window.removeEventListener('scroll', onScroll);
     window.removeEventListener('three:toggle', onToggle);
+    window.removeEventListener('scene:invalidate', onInvalidate);
     document.removeEventListener('visibilitychange', onVisibilityChange);
     cleanupPointer?.();
 
@@ -398,6 +437,7 @@ export default function initThreeHero(): void {
     pointsMaterial.dispose();
     lineBuffers.geometry.dispose();
     lineMaterial.dispose();
+    arrowhead.dispose();
 
     if (root) root.dataset._threeInited = '';
   }
@@ -411,6 +451,9 @@ export default function initThreeHero(): void {
   } else {
     start();
   }
+
+  // NEW: lets the intro loader count the scene as ready.
+  window.dispatchEvent(new CustomEvent('scene:ready'));
 }
 
 // Auto-initialize when the module is imported.
